@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model coupons {
+  id                  Int     @id @default(autoincrement())
+  user_id             Int
+  discount_percentage Int
+  code                String  @unique @db.VarChar(30)
+  used                Boolean @default(false)
+  users               users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model events {
+  id              Int             @id @default(autoincrement())
+  organizer_id    Int?
+  name            String          @db.VarChar(100)
+  description     String
+  category_id     Int?
+  location        String          @default("online") @db.VarChar(20)
+  start_date      DateTime        @db.Timestamp(6)
+  end_date        DateTime        @db.Timestamp(6)
+  total_seats     Int
+  remaining_seats Int
+  price           Decimal         @db.Decimal(10, 2)
+  created_at      DateTime?       @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
+  event_category  event_category? @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users           users?          @relation(fields: [organizer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  review          review[]
+  transactions    transactions[]
+  vouchers        vouchers[]
+}
+
+model points {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  points     Int
+  expired_at DateTime  @db.Timestamp(6)
+  created_at DateTime? @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model referral_logs {
+  id                                            Int       @id @default(autoincrement())
+  user_id                                       Int
+  referral_code_used                            String    @unique @db.VarChar(30)
+  created_at                                    DateTime? @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
+  users_referral_logs_referral_code_usedTousers users     @relation("referral_logs_referral_code_usedTousers", fields: [referral_code_used], references: [referral_code], onDelete: NoAction, onUpdate: NoAction)
+  users_referral_logs_user_idTousers            users     @relation("referral_logs_user_idTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model review {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  event_id   Int
+  message    String?
+  rating     Int
+  created_at DateTime? @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
+  events     events    @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([user_id, event_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model transactions {
+  id              Int                  @id @default(autoincrement())
+  user_id         Int
+  event_id        Int
+  ticket_quantity Int
+  payment_date    DateTime?            @db.Timestamp(6)
+  payment_proof   String?              @db.VarChar(100)
+  payment_method  String?              @db.VarChar(30)
+  status          transaction_statuses
+  created_at      DateTime             @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
+  events          events               @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users           users                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  id                                                    Int             @id @default(autoincrement())
+  first_name                                            String          @db.VarChar(30)
+  last_name                                             String          @db.VarChar(30)
+  email                                                 String          @unique @db.VarChar(30)
+  password                                              String          @db.VarChar(255)
+  role                                                  user_roles
+  profile_picture                                       String?         @db.VarChar(100)
+  referral_code                                         String?         @unique @db.VarChar(30)
+  created_at                                            DateTime?       @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
+  coupons                                               coupons[]
+  events                                                events[]
+  points                                                points[]
+  referral_logs_referral_logs_referral_code_usedTousers referral_logs?  @relation("referral_logs_referral_code_usedTousers")
+  referral_logs_referral_logs_user_idTousers            referral_logs[] @relation("referral_logs_user_idTousers")
+  review                                                review[]
+  transactions                                          transactions[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model vouchers {
+  id                  Int      @id @default(autoincrement())
+  event_id            Int
+  name                String   @db.VarChar(50)
+  description         String   @db.VarChar(50)
+  tnc_description     String?
+  discount_percentage Int
+  start_date          DateTime @db.Timestamp(6)
+  expired_date        DateTime @db.Timestamp(6)
+  code                String   @unique @db.VarChar(30)
+  max_usage           Int?
+  current_usage       Int?     @default(0)
+  events              events   @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model event_category {
+  id       Int      @id @default(autoincrement())
+  category String   @unique @db.VarChar(30)
+  events   events[]
+}
+
+enum user_roles {
+  organizer
+  customer
+}
+
+enum transaction_statuses {
+  waiting_for_payment            @map("waiting for payment")
+  waiting_for_admin_confirmation @map("waiting for admin confirmation")
+  done
+  rejected
+  expired
+  canceled
+}
