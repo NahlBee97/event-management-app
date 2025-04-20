@@ -8,11 +8,11 @@ async function FindCouponByUserIdController(
 ) {
   try {
     const userId = parseInt(req.params.id);
-    const referrals = await FindCouponByUserIdService(userId);
+    const coupon = await FindCouponByUserIdService(userId);
 
     res.status(200).send({
       message: `Get coupon by user id ${userId} success`,
-      data: referrals,
+      data: coupon,
     });
   } catch (err) {
     next(err);

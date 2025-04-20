@@ -1,5 +1,4 @@
 import prisma from "../lib/prisma";
-import { FindUserById } from "./user.service";
 
 async function FindCouponByUserId(userId: number) {
   try {
@@ -20,9 +19,9 @@ async function FindCouponByUserId(userId: number) {
 
 async function FindCouponByUserIdService(userId: number) {
   try {
-    const referrals = await FindCouponByUserId(userId);
+    const coupon = await FindCouponByUserId(userId);
 
-    return referrals;
+    return coupon;
   } catch (err) {
     throw err;
   }
