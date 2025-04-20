@@ -1,5 +1,23 @@
 import { Request, Response, NextFunction } from "express";
-import { EditTransactionByIdService, FindTransactionByUserIdService } from "../services/transaction.service";
+import { CreateTransactionService, EditTransactionByIdService, FindTransactionByUserIdService } from "../services/transaction.service";
+
+async function CreateTransactionController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const bodyData = req.body;
+    const newTransaction = await CreateTransactionService(bodyData);
+
+    res.status(200).send({
+      message: "Create new transaction success",
+      data: newTransaction,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
 
 async function FindTransactionByUserIdController(
   req: Request,
@@ -38,4 +56,4 @@ async function EditTransactionByIdController(
   }
 }
 
-export { FindTransactionByUserIdController, EditTransactionByIdController };
+export { CreateTransactionController, FindTransactionByUserIdController, EditTransactionByIdController };
