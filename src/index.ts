@@ -5,6 +5,7 @@ import { PORT } from "./config";
 import UserRouter from "./routers/user.router";
 import PointRouter from "./routers/point.router"
 import ReferralRouter from "./routers/referral.router"
+import CouponRouter from "./routers/coupon.router"
 
 const port = PORT;
 const app: Application = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use("/api", UserRouter);
 app.use("/api", PointRouter);
 app.use("/api", ReferralRouter);
+app.use("/api", CouponRouter);
 
 // ERROR HANDLING MIDDLEWARE
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
