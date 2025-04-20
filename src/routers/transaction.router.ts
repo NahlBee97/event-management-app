@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { FindTransactionByUserIdController } from "../controllers/transaction.controller";
+import { EditTransactionByIdController, FindTransactionByUserIdController } from "../controllers/transaction.controller";
 
 const router = Router();
 
 // get transaction list by user id
-router.get("/transactions/:id", FindTransactionByUserIdController);
+router.get("/transactions/:user_id", FindTransactionByUserIdController);
+// update transaction status by id
+router.put("/transactions/:id", EditTransactionByIdController);
 
 export default router;

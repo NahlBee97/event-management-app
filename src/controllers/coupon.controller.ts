@@ -7,7 +7,7 @@ async function FindCouponByUserIdController(
   next: NextFunction
 ) {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = parseInt(req.params.user_id);
     const coupon = await FindCouponByUserIdService(userId);
 
     res.status(200).send({
