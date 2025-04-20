@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { FindUserByIdService, EditUserByIdService } from "../services/user.service";
 
-// find user by id controller
 async function FindUserByIdController (req: Request, res: Response, next: NextFunction) {
     try {
         const userId = parseInt(req.params.id);
@@ -16,7 +15,6 @@ async function FindUserByIdController (req: Request, res: Response, next: NextFu
     }
 }
 
-// edit user by id controller
 async function EditUserByIdController (req: Request, res: Response, next: NextFunction) {
     try {
       const userId = parseInt(req.params.id);

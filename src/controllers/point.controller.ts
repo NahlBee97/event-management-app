@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { FindPointByUserIdService } from "../services/point.service";
 
-// find point by user id controller
 async function FindPointByUserIdController(
   req: Request,
   res: Response,

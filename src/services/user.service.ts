@@ -73,3 +73,5 @@ async function EditUserByIdService(userId: number, body: IBodyUser) {
 }
 
 export { FindUserByIdService, EditUserByIdService };
+// export often use function
+export { FindUserById } ;
