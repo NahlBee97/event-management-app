@@ -7,6 +7,7 @@ export async function GetAllEventController(req: Request, res: Response, next: N
 
         res.status(200).send({
             message: 'Success',
+            count: events.length,
             data: events
         })
     } catch (err) {
