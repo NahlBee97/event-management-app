@@ -18,6 +18,18 @@ export async function GetReviewByEventIdSevice(params: string) {
 
 }
 
-async function GetReviewByUserId() {
+export async function GetReviewByUserIdservice(params: string) {
+    try {
+        const review = await prisma.review.findFirst({
+            where: {
+                user_id: Number(params)
+            }
+        })
 
+        if (!review) throw new Error(`Review user with this id ${params} not found`)
+
+        return review
+    } catch (err) {
+        throw err;
+    }
 }
