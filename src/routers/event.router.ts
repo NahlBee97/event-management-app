@@ -11,5 +11,4 @@ router.get('/detail/:id', GetEventDetailByIdController)
 
 router.get('/categories', GetAllCategoriesController);
 
-
 export default router;
