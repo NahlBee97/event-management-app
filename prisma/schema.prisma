@@ -52,7 +52,7 @@ model referral_logs {
   user_id                                       Int
   referral_code_used                            String    @unique @db.VarChar(30)
   created_at                                    DateTime? @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
-  users_referral_logs_referral_code_usedTousers users     @relation("referral_logs_referral_code_usedTousers", fields: [referral_code_used], references: [referral_code], onDelete: NoAction, onUpdate: NoAction)
+  users_referral_logs_referral_code_usedTousers users     @relation("referral_logs_referral_code_usedTousers", fields: [referral_code_used], references: [referral_code], onDelete: NoAction, onUpdate: NoAction, map: "fk_referral_code_used")
   users_referral_logs_user_idTousers            users     @relation("referral_logs_user_idTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -109,7 +109,7 @@ model vouchers {
   id                  Int      @id @default(autoincrement())
   event_id            Int
   name                String   @db.VarChar(50)
-  description         String   @db.VarChar(50)
+  description         String   @db.VarChar(300)
   tnc_description     String?
   discount_percentage Int
   start_date          DateTime @db.Timestamp(6)
