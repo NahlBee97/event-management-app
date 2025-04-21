@@ -40,7 +40,7 @@ model events {
 
 model points {
   id         Int       @id @default(autoincrement())
-  user_id    Int
+  user_id    Int       @unique(map: "unique_user_id")
   points     Int
   expired_at DateTime  @db.Timestamp(6)
   created_at DateTime? @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
@@ -97,7 +97,7 @@ model users {
   created_at                                            DateTime?       @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
   coupons                                               coupons[]
   events                                                events[]
-  points                                                points[]
+  points                                                points?
   referral_logs_referral_logs_referral_code_usedTousers referral_logs[] @relation("referral_logs_referral_code_usedTousers")
   referral_logs_referral_logs_user_idTousers            referral_logs[] @relation("referral_logs_user_idTousers")
   review                                                review[]
