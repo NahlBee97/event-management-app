@@ -32,15 +32,6 @@ app.use("/api", TransactionRouter);
 // ERROR HANDLING MIDDLEWARE
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(400).json({
-    error: true,
-    message: err.message,
-  });
-});
-
-
-
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  res.status(400).json({
     success: false,
     message: err.message,
   });
