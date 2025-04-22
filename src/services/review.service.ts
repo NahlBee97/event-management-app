@@ -55,17 +55,41 @@ export async function CreateReviewService(params: IReview) {
         const isExistReview = await FindUserReview(params.user_id, params.event_id)
         if (isExistReview) throw new Error("Your review already exist, you had reviewed this event!")
 
-        await prisma.$transaction(async (t) => {
-            const newReview = await prisma.review.create({
-                data: {
-                    user_id: params?.user_id,
-                    event_id: params?.event_id,
-                    message: params?.message,
-                    rating: params?.rating,
+        const newReview = await prisma.review.create({
+            data: {
+                user_id: params?.user_id,
+                event_id: params?.event_id,
+                message: params?.message,
+                rating: params?.rating,
+            },
+        });
+        return newReview
+
+    } catch (error) {
+        throw error
+    }
+}
+
+export async function UpdateReviewService(params: IReview) {
+    try {
+        const { user_id, event_id, message, rating } = params;
+
+        const isExistReview = await FindUserReview(user_id, event_id)
+        if (!isExistReview) throw new Error("Review not found")
+
+        const updateReview = await prisma.review.update({
+            where: {
+                user_id_event_id: {
+                    user_id,
+                    event_id,
                 },
-            });
-            return newReview
-        })
+            },
+            data: {
+                message,
+                rating
+            },
+        });
+        return updateReview
     } catch (error) {
         throw error
     }
