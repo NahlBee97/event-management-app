@@ -1,4 +1,22 @@
 import prisma from "../lib/prisma";
+import { IReview } from "../interfaces/review.interface";
+
+async function FindUserReview(user_id: number, event_id: number) {
+    try {
+        const existingReview = await prisma.review.findUnique({
+            where: {
+                user_id_event_id: {
+                    user_id,
+                    event_id,
+                },
+            },
+        });
+        return existingReview
+
+    } catch (error) {
+        throw error
+    }
+}
 
 export async function GetReviewByEventIdSevice(params: string) {
     try {
@@ -14,8 +32,6 @@ export async function GetReviewByEventIdSevice(params: string) {
     } catch (err) {
         throw err;
     }
-
-
 }
 
 export async function GetReviewByUserIdservice(params: string) {
@@ -31,5 +47,26 @@ export async function GetReviewByUserIdservice(params: string) {
         return review
     } catch (err) {
         throw err;
+    }
+}
+
+export async function CreateReviewService(params: IReview) {
+    try {
+        const isExistReview = await FindUserReview(params.user_id, params.event_id)
+        if (isExistReview) throw new Error("Your review already exist, you had reviewed this event!")
+
+        await prisma.$transaction(async (t) => {
+            const newReview = await prisma.review.create({
+                data: {
+                    user_id: params?.user_id,
+                    event_id: params?.event_id,
+                    message: params?.message,
+                    rating: params?.rating,
+                },
+            });
+            return newReview
+        })
+    } catch (error) {
+        throw error
     }
 }
