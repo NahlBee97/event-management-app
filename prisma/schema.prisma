@@ -19,23 +19,23 @@ model coupons {
 }
 
 model events {
-  id              Int             @id @default(autoincrement())
+  id              Int              @id @default(autoincrement())
   organizer_id    Int?
-  name            String          @db.VarChar(100)
+  name            String           @db.VarChar(100)
   description     String
   category_id     Int?
-  location        String          @default("online") @db.VarChar(20)
-  start_date      DateTime        @db.Timestamp(6)
-  end_date        DateTime        @db.Timestamp(6)
+  location        String           @default("online") @db.VarChar(20)
+  start_date      DateTime         @db.Timestamp(6)
+  end_date        DateTime         @db.Timestamp(6)
   total_seats     Int
   remaining_seats Int
-  price           Decimal         @db.Decimal(10, 2)
-  created_at      DateTime?       @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
-  event_category  event_category? @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users           users?          @relation(fields: [organizer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  price           Decimal          @db.Decimal(10, 2)
+  created_at      DateTime?        @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
+  event_vouchers  event_vouchers[]
+  event_category  event_category?  @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users           users?           @relation(fields: [organizer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   review          review[]
   transactions    transactions[]
-  vouchers        vouchers[]
 }
 
 model points {
@@ -97,16 +97,22 @@ model users {
   created_at                                            DateTime?       @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
   coupons                                               coupons[]
   events                                                events[]
-  points                                                points[]
+  points                                                points?
   referral_logs_referral_logs_referral_code_usedTousers referral_logs[] @relation("referral_logs_referral_code_usedTousers")
   referral_logs_referral_logs_user_idTousers            referral_logs[] @relation("referral_logs_user_idTousers")
   review                                                review[]
   transactions                                          transactions[]
 }
 
+model event_category {
+  id       Int      @id @default(autoincrement())
+  category String   @unique @db.VarChar(30)
+  events   events[]
+}
+
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-model vouchers {
-  id                  Int      @id @default(autoincrement())
+model event_vouchers {
+  id                  Int      @id(map: "vouchers_pkey") @default(autoincrement())
   event_id            Int
   name                String   @db.VarChar(50)
   description         String   @db.VarChar(300)
@@ -114,16 +120,17 @@ model vouchers {
   discount_percentage Int
   start_date          DateTime @db.Timestamp(6)
   expired_date        DateTime @db.Timestamp(6)
-  code                String   @unique @db.VarChar(30)
+  code                String   @unique(map: "vouchers_code_key") @db.VarChar(30)
   max_usage           Int?
   current_usage       Int?     @default(0)
-  events              events   @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  events              events   @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "vouchers_event_id_fkey")
 }
 
-model event_category {
-  id       Int      @id @default(autoincrement())
-  category String   @unique @db.VarChar(30)
-  events   events[]
+model user_vouchers {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  voucher_id Int
+  claimed_at DateTime? @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
 }
 
 enum user_roles {
