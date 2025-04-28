@@ -8,5 +8,4 @@ router.put('/', UpdateReviewController)
 router.get('/event/:id', GetReviewByEventIdController)
 router.get('/user/:id', GetReviewByUserIdController)
 
-
 export default router;

@@ -20,10 +20,19 @@ async function FindUserReview(user_id: number, event_id: number) {
 
 export async function GetReviewByEventIdSevice(params: string) {
     try {
-        const review = await prisma.review.findFirst({
+        const review = await prisma.review.findMany({
             where: {
                 event_id: Number(params)
-            }
+            },
+            include: {
+                users: {
+                    select: {
+                        first_name: true,
+                        last_name: true,
+                        profile_picture: true
+                    },
+                },
+            },
         })
 
         if (!review) throw new Error(`Review with this id ${params} not found`)
