@@ -31,6 +31,7 @@ model events {
   remaining_seats Int
   price           Decimal          @db.Decimal(10, 2)
   created_at      DateTime?        @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
+  path            String?          @db.VarChar(255)
   event_vouchers  event_vouchers[]
   event_category  event_category?  @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users           users?           @relation(fields: [organizer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -107,6 +108,7 @@ model users {
 model event_category {
   id       Int      @id @default(autoincrement())
   category String   @unique @db.VarChar(30)
+  path     String?  @db.VarChar(255)
   events   events[]
 }
 
