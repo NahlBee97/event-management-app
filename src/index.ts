@@ -1,4 +1,5 @@
 import express, { Application, Request, Response, NextFunction } from "express";
+import cors from 'cors';
 
 import { PORT } from "./config";
 
@@ -13,6 +14,10 @@ import TransactionRouter from "./routers/transaction.router"
 
 const port = PORT || 8080;
 const app: Application = express();
+
+app.use(cors({
+  origin: 'http://localhost:3000',
+}));
 
 app.use(express.json());
 
