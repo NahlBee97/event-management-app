@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { GetReviewByEventIdController, GetReviewByUserIdController } from "../controllers/review.controller";
+import { CreateReviewController, GetReviewByEventIdController, GetReviewByUserIdController, UpdateReviewController } from "../controllers/review.controller";
 
 const router = Router();
 
+router.post('/', CreateReviewController)
+router.put('/', UpdateReviewController)
 router.get('/event/:id', GetReviewByEventIdController)
-
 router.get('/user/:id', GetReviewByUserIdController)
 
 export default router;
