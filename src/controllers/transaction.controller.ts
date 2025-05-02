@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { CreateTransactionService, EditTransactionByIdService, FindTransactionByUserIdService } from "../services/transaction.service";
+import { CreateTransactionService, EditTransactionByIdService, FindTransactionByIdService, FindTransactionByUserIdService } from "../services/transaction.service";
+import { FindUserByIdService } from "../services/user.service";
 
 async function CreateTransactionController(
   req: Request,
@@ -37,6 +38,24 @@ async function FindTransactionByUserIdController(
   }
 }
 
+async function FindTransactionByIdController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const id = parseInt(req.params.id);
+    const transaction = await FindTransactionByIdService(id);
+
+    res.status(200).send({
+      message: `Get transaction by id ${id} success`,
+      data: transaction,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function EditTransactionByIdController(
   req: Request,
   res: Response,
@@ -56,4 +75,4 @@ async function EditTransactionByIdController(
   }
 }
 
-export { CreateTransactionController, FindTransactionByUserIdController, EditTransactionByIdController };
+export { CreateTransactionController, FindTransactionByUserIdController, EditTransactionByIdController, FindTransactionByIdController };
