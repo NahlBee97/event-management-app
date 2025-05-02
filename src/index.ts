@@ -10,6 +10,7 @@ import PointRouter from "./routers/point.router"
 import ReferralRouter from "./routers/referral.router"
 import CouponRouter from "./routers/coupon.router"
 import TransactionRouter from "./routers/transaction.router"
+import RegisterRouter from "./routers/auth.router"
 
 const port = PORT || 8080;
 const app: Application = express();
@@ -28,6 +29,7 @@ app.use("/api", PointRouter);
 app.use("/api", ReferralRouter);
 app.use("/api", CouponRouter);
 app.use("/api", TransactionRouter);
+app.use("/", RegisterRouter);
 
 // ERROR HANDLING MIDDLEWARE
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

@@ -41,6 +41,23 @@ async function FindTransactionByUserId(userId: number) {
   }
 }
 
+async function FindTransactionById(id: number) {
+  try {
+    const transaction = await prisma.transactions.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!transaction)
+      throw new Error("You don't have any transaction");
+
+    return transaction;
+  } catch (err) {
+    throw err;
+  }
+}
+
 async function EditTransactionById(id: number, status: transaction_statuses) {
   try {
     const updatedTransaction = await prisma.transactions.update({
@@ -79,6 +96,16 @@ async function FindTransactionByUserIdService(userId: number) {
   }
 }
 
+async function FindTransactionByIdService(id: number) {
+  try {
+    const transactions = await FindTransactionById(id);
+
+    return transactions;
+  } catch (err) {
+    throw err;
+  }
+}
+
 async function EditTransactionByIdService(id: number, status: transaction_statuses) {
   try {
     const updatedTransaction = await EditTransactionById(id, status);
@@ -89,4 +116,4 @@ async function EditTransactionByIdService(id: number, status: transaction_status
   }
 }
 
-export { CreateTransactionService, FindTransactionByUserIdService, EditTransactionByIdService };
+export { CreateTransactionService, FindTransactionByUserIdService, EditTransactionByIdService, FindTransactionByIdService };
