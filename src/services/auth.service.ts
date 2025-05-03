@@ -178,7 +178,7 @@ async function Login(bodyData: ILogin) {
   }
 }
 
-async function RegisterService(bodyData: IRegister) {
+export async function RegisterService(bodyData: IRegister) {
   try {
     const newUser = await Register(bodyData);
 
@@ -197,7 +197,7 @@ async function RegisterService(bodyData: IRegister) {
   }
 }
 
-async function LoginService(bodyData: ILogin) {
+export async function LoginService(bodyData: ILogin) {
   try {
     const user = await Login(bodyData);
 
@@ -206,5 +206,3 @@ async function LoginService(bodyData: ILogin) {
     throw err;
   }
 }
-
-export { RegisterService, LoginService };

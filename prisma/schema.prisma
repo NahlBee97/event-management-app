@@ -10,12 +10,14 @@ datasource db {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model coupons {
-  id                  Int     @id @default(autoincrement())
+  id                  Int       @id @default(autoincrement())
   user_id             Int
   discount_percentage Int
-  code                String  @unique @db.VarChar(30)
-  used                Boolean @default(false)
-  users               users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  code                String    @unique @db.VarChar(30)
+  used                Boolean   @default(false)
+  expired_at          DateTime? @default(dbgenerated("(CURRENT_TIMESTAMP + '3 mons'::interval)")) @db.Timestamp(6)
+  created_at          DateTime? @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
+  users               users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model points {

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { LoginService, RegisterService } from "../services/auth.service";
 
-async function RegisterController(
+export async function RegisterController(
   req: Request,
   res: Response,
   next: NextFunction
@@ -19,7 +19,7 @@ async function RegisterController(
   }
 }
 
-async function LoginController(
+export async function LoginController(
   req: Request,
   res: Response,
   next: NextFunction
@@ -36,5 +36,3 @@ async function LoginController(
     next(err);
   }
 }
-
-export { RegisterController, LoginController };

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { CreateTransactionController, EditTransactionByIdController, FindTransactionByIdController, FindTransactionByUserIdController } from "../controllers/transaction.controller";
+import { CreateTransactionController, DeleteTransactionByIdController, EditTransactionByIdController, FindTransactionByIdController, FindTransactionByUserIdController } from "../controllers/transaction.controller";
 
 const router = Router();
 
@@ -11,5 +11,7 @@ router.get("/:user_id", FindTransactionByUserIdController);
 router.get("/detail/:id", FindTransactionByIdController);
 // update transaction status by id
 router.put("/:id", EditTransactionByIdController);
+//delete
+router.delete("/:id", DeleteTransactionByIdController);
 
 export default router;

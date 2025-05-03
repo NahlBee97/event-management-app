@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { FindUserByIdService, EditUserByIdService } from "../services/user.service";
+import { FindUserByIdService, EditUserByIdService, DeleteUserByIdService } from "../services/user.service";
 
-async function FindUserByIdController (req: Request, res: Response, next: NextFunction) {
+export async function FindUserByIdController (req: Request, res: Response, next: NextFunction) {
     try {
         const userId = parseInt(req.params.id);
         const user = await FindUserByIdService(userId);
@@ -15,7 +15,7 @@ async function FindUserByIdController (req: Request, res: Response, next: NextFu
     }
 }
 
-async function EditUserByIdController (req: Request, res: Response, next: NextFunction) {
+export async function EditUserByIdController (req: Request, res: Response, next: NextFunction) {
     try {
       const userId = parseInt(req.params.id);
       const bodyData = req.body;
@@ -30,5 +30,19 @@ async function EditUserByIdController (req: Request, res: Response, next: NextFu
     }
 }
 
+export async function DeleteUserByIdController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = parseInt(req.params.id);
+    await DeleteUserByIdService(userId);
 
-export { FindUserByIdController, EditUserByIdController }
+    res.status(200).send({
+      message: `Delete user by user id ${userId} success`,
+    });
+  } catch (err) {
+    next(err);
+  }
+}

@@ -103,3 +103,15 @@ export async function UpdateReviewService(params: IReview) {
         throw error
     }
 }
+
+export async function DeleteReviewService(id: number) {
+  try {
+    await prisma.review.delete({
+        where: {
+            id
+        }
+    })
+  } catch (error) {
+    throw error;
+  }
+}

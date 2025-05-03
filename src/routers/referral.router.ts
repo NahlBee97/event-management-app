@@ -3,7 +3,8 @@ import { FindReferralByUserIdController } from "../controllers/referral.controll
 
 const router = Router();
 
-// get point by user id
+// get referral by user id
 router.get("/:user_id", FindReferralByUserIdController);
+// create referral is in register
 
 export default router;

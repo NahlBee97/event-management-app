@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma";
 
-export async function GetEventDetailByIdSevice(params: string) {
+export async function GetEventDetailByIdService(params: string) {
     try {
         const event = await prisma.events.findUnique({
             where: {

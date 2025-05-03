@@ -5,7 +5,7 @@ import { PORT } from "./config";
 import UserRouter from "./routers/user.router";
 import EventRouter from './routers/event.router'
 import VoucherRouter from './routers/voucher.router'
-import ReviewRouter from './routers/review.reouter'
+import ReviewRouter from './routers/review.router'
 import PointRouter from "./routers/point.router"
 import ReferralRouter from "./routers/referral.router"
 import CouponRouter from "./routers/coupon.router"
@@ -21,8 +21,8 @@ app.get('/', (res: Response, req: Request) => {
   console.log('welcome');
 })
 
-app.use("/", RegisterRouter);
-app.use("/api/users", UserRouter);
+app.use("/auth", RegisterRouter);
+app.use("/auth/users", UserRouter);
 app.use('/api/events', EventRouter)
 app.use('/api/vouchers', VoucherRouter)
 app.use("/api/coupons", CouponRouter);
