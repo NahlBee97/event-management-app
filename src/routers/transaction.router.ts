@@ -4,12 +4,12 @@ import { CreateTransactionController, EditTransactionByIdController, FindTransac
 const router = Router();
 
 // add new transaction
-router.post("/transactions", CreateTransactionController )
+router.post("/", CreateTransactionController )
 // get transaction list by user id
-router.get("/transactions/:user_id", FindTransactionByUserIdController);
+router.get("/:user_id", FindTransactionByUserIdController);
 // get transaction by id
-router.get("/transactions/detail/:id", FindTransactionByIdController);
+router.get("/detail/:id", FindTransactionByIdController);
 // update transaction status by id
-router.put("/transactions/:id", EditTransactionByIdController);
+router.put("/:id", EditTransactionByIdController);
 
 export default router;

@@ -21,15 +21,15 @@ app.get('/', (res: Response, req: Request) => {
   console.log('welcome');
 })
 
-app.use('/api/event', EventRouter)
-app.use('/api/voucher', VoucherRouter)
-app.use('/api/review', ReviewRouter)
-app.use("/api", UserRouter);
-app.use("/api", PointRouter);
-app.use("/api", ReferralRouter);
-app.use("/api", CouponRouter);
-app.use("/api", TransactionRouter);
 app.use("/", RegisterRouter);
+app.use("/api/users", UserRouter);
+app.use('/api/events', EventRouter)
+app.use('/api/vouchers', VoucherRouter)
+app.use("/api/coupons", CouponRouter);
+app.use('/api/reviews', ReviewRouter)
+app.use("/api/referrals", ReferralRouter);
+app.use("/api/points", PointRouter);
+app.use("/api/transactions", TransactionRouter);
 
 // ERROR HANDLING MIDDLEWARE
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

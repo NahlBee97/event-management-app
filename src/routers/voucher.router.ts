@@ -1,10 +1,16 @@
 import { Router } from "express";
-import { GetVoucherByEventIdController, GetVoucherByUserIdController } from "../controllers/voucher.controller";
+import { CreateVoucherController, DeleteVoucherByIdController, EditVoucherByIdController, GetVoucherByEventIdController, GetVoucherByUserIdController } from "../controllers/voucher.controller";
 
 const router = Router();
 
-router.get('/event/:id', GetVoucherByEventIdController)
-router.get('/user/:id', GetVoucherByUserIdController)
+router.get('/events/:id', GetVoucherByEventIdController)
+router.get('/users/:id', GetVoucherByUserIdController)
+// create voucher
+router.post("/", CreateVoucherController)
+// update voucher
+router.put("/:id", EditVoucherByIdController)
+// delete voucher
+router.delete("/:id", DeleteVoucherByIdController)
 
 
 export default router;

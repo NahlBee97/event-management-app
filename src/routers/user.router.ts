@@ -4,8 +4,8 @@ import { EditUserByIdController, FindUserByIdController } from "../controllers/u
 const router = Router();
 
 // get user by id
-router.get("/auth/users/:id", FindUserByIdController);
+router.get("/:id", FindUserByIdController);
 // edit user by id
-router.put("/auth/users/:id", EditUserByIdController);
+router.put("/:id", EditUserByIdController);
 
 export default router;
