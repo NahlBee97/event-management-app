@@ -1,4 +1,5 @@
 import express, { Application, Request, Response, NextFunction } from "express";
+import cors from "cors"
 
 import { PORT } from "./config";
 
@@ -10,19 +11,25 @@ import PointRouter from "./routers/point.router"
 import ReferralRouter from "./routers/referral.router"
 import CouponRouter from "./routers/coupon.router"
 import TransactionRouter from "./routers/transaction.router"
-import RegisterRouter from "./routers/auth.router"
+import AuthRouter from "./routers/auth.router"
 
 const port = PORT || 8080;
 const app: Application = express();
 
 app.use(express.json());
 
-app.get('/', (res: Response, req: Request) => {
-  console.log('welcome');
-})
+// Use CORS middleware
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Allow requests from this origin
+    methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  })
+);
 
-app.use("/auth", RegisterRouter);
-app.use("/auth/users", UserRouter);
+
+app.use("/auth", AuthRouter);
+app.use("/api/users", UserRouter);
 app.use('/api/events', EventRouter)
 app.use('/api/vouchers', VoucherRouter)
 app.use("/api/coupons", CouponRouter);

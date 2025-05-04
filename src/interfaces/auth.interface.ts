@@ -6,7 +6,6 @@ export interface IRegister {
   email: string;
   password: string;
   role: user_roles;
-  referral_code: string;
   referral_code_used: string;
 }
 

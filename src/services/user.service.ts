@@ -1,6 +1,7 @@
 import { IBodyUser } from "../interfaces/user.interface";
 import prisma from "../lib/prisma";
 
+
 //find user by id function
 export async function FindUserById(userId: number) {
   try {
@@ -27,7 +28,7 @@ async function EditUserById(userId: number, body: IBodyUser) {
       role,
       profile_picture,
     } = body;
-
+    
     const editedUser = await prisma.users.update({
       where: { id: userId },
       data: {
@@ -39,9 +40,9 @@ async function EditUserById(userId: number, body: IBodyUser) {
         profile_picture: profile_picture || existedUser?.profile_picture,
       },
     });
-
+    
     return editedUser;
-
+    
   } catch (err) {
     throw err;
   }
@@ -55,28 +56,28 @@ async function DeleteUserById(userId: number) {
         user_id: userId,
       },
     });
-
+    
     // Delete related data from the coupons table
     await prisma.coupons.deleteMany({
       where: {
         user_id: userId,
       },
     });
-
+    
     // Delete related data from the points table
     await prisma.points.deleteMany({
       where: {
         user_id: userId,
       },
     });
-
+    
     // Delete related data from the review table
     await prisma.review.deleteMany({
       where: {
         user_id: userId,
       },
     });
-
+    
     // Delete related data from the transactions table
     await prisma.transactions.deleteMany({
       where: {
@@ -97,7 +98,7 @@ async function DeleteUserById(userId: number) {
         user_id: userId,
       },
     });
-
+    
     // Finally, delete the user record
     await prisma.users.delete({
       where: {
@@ -107,6 +108,20 @@ async function DeleteUserById(userId: number) {
   } catch (err) {
     throw err;
   }
+}
+
+export async function GetAllUserService(params: string | null) {
+  let users;
+  if (params) {
+    users = await prisma.users.findFirst({
+      where: {
+        email: params
+      }
+    });
+  } else {
+    users = await prisma.users.findMany();
+  }
+  return users;
 }
 
 // Find user by id service
