@@ -26,11 +26,11 @@ export async function LoginController(
 ) {
   try {
     const bodyData = req.body;
-    const newUser = await LoginService(bodyData);
+    const user = await LoginService(bodyData);
 
     res.status(200).send({
       message: `Login success`,
-      data: newUser,
+      data: user,
     });
   } catch (err) {
     next(err);

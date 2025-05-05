@@ -1,17 +1,17 @@
 import express, { Application, Request, Response, NextFunction } from "express";
-import cors from "cors"
+import cors from "cors";
 
 import { PORT } from "./config";
 
 import UserRouter from "./routers/user.router";
-import EventRouter from './routers/event.router'
-import VoucherRouter from './routers/voucher.router'
-import ReviewRouter from './routers/review.router'
-import PointRouter from "./routers/point.router"
-import ReferralRouter from "./routers/referral.router"
-import CouponRouter from "./routers/coupon.router"
-import TransactionRouter from "./routers/transaction.router"
-import AuthRouter from "./routers/auth.router"
+import EventRouter from "./routers/event.router";
+import VoucherRouter from "./routers/voucher.router";
+import ReviewRouter from "./routers/review.router";
+import PointRouter from "./routers/point.router";
+import ReferralRouter from "./routers/referral.router";
+import CouponRouter from "./routers/coupon.router";
+import TransactionRouter from "./routers/transaction.router";
+import AuthRouter from "./routers/auth.router";
 
 const port = PORT || 8080;
 const app: Application = express();
@@ -27,13 +27,12 @@ app.use(
   })
 );
 
-
 app.use("/auth", AuthRouter);
 app.use("/users", UserRouter);
-app.use('/events', EventRouter)
-app.use('/vouchers', VoucherRouter)
+app.use("/events", EventRouter);
+app.use("/vouchers", VoucherRouter);
 app.use("/coupons", CouponRouter);
-app.use('/reviews', ReviewRouter)
+app.use("/reviews", ReviewRouter);
 app.use("/referrals", ReferralRouter);
 app.use("/points", PointRouter);
 app.use("/transactions", TransactionRouter);

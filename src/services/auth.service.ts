@@ -8,7 +8,7 @@ async function FindUserByEmail(email: string) {
   try {
     const user = await prisma.users.findFirst({
       where: {
-        email: email,
+        email,
       },
     });
     return user;
@@ -172,7 +172,7 @@ async function Login(bodyData: ILogin) {
 
     const token = sign(payload, String(SECRET_KEY), { expiresIn: "1h" });
 
-    return { user: payload, token };
+    return {user: payload, token};
   } catch (err) {
     throw err;
   }
