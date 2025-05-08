@@ -3,18 +3,16 @@ import prisma from "../lib/prisma";
 
 export async function SearchEventService(params: ISearchEvent) {
     try {
-        const { category, start_date, end_date, min_price, max_price } = params
+        const { category_id, start_date, end_date, min_price, max_price } = params
         const filters: any = {};
 
-        if (category) {
-            filters.event_category = {
-                category: category as string,
-            };
+        if (category_id) {
+            filters.category_id = Number(category_id);
         }
 
         if (start_date) {
             filters.start_date = {
-                gte: new Date(start_date), // format ISO seperti yang kamu kasih
+                gte: new Date(start_date),
             };
         }
 
@@ -33,12 +31,13 @@ export async function SearchEventService(params: ISearchEvent) {
 
         const events = await prisma.events.findMany({
             where: {
-                ...filters,
+                ...filters
             },
             include: {
                 event_category: true,
             },
         });
+
 
         if (!events) throw new Error(`Event not found`)
 
