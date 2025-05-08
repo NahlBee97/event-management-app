@@ -24,15 +24,15 @@ app.use((0, cors_1.default)({
     methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 }));
-app.use("/auth", auth_router_1.default);
-app.use("/users", user_router_1.default);
-app.use("/events", event_router_1.default);
-app.use("/vouchers", voucher_router_1.default);
-app.use("/coupons", coupon_router_1.default);
-app.use("/reviews", review_router_1.default);
-app.use("/referrals", referral_router_1.default);
-app.use("/points", point_router_1.default);
-app.use("/transactions", transaction_router_1.default);
+app.use("api/auth", auth_router_1.default);
+app.use("api/users", user_router_1.default);
+app.use("api/events", event_router_1.default);
+app.use("api/vouchers", voucher_router_1.default);
+app.use("api/coupons", coupon_router_1.default);
+app.use("api/reviews", review_router_1.default);
+app.use("api/referrals", referral_router_1.default);
+app.use("api/points", point_router_1.default);
+app.use("api/transactions", transaction_router_1.default);
 // ERROR HANDLING MIDDLEWARE
 app.use((err, req, res, next) => {
     res.status(400).json({

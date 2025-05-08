@@ -27,15 +27,15 @@ app.use(
   })
 );
 
-app.use("/auth", AuthRouter);
-app.use("/users", UserRouter);
-app.use("/events", EventRouter);
-app.use("/vouchers", VoucherRouter);
-app.use("/coupons", CouponRouter);
-app.use("/reviews", ReviewRouter);
-app.use("/referrals", ReferralRouter);
-app.use("/points", PointRouter);
-app.use("/transactions", TransactionRouter);
+app.use("api/auth", AuthRouter);
+app.use("api/users", UserRouter);
+app.use("api/events", EventRouter);
+app.use("api/vouchers", VoucherRouter);
+app.use("api/coupons", CouponRouter);
+app.use("api/reviews", ReviewRouter);
+app.use("api/referrals", ReferralRouter);
+app.use("api/points", PointRouter);
+app.use("api/transactions", TransactionRouter);
 
 // ERROR HANDLING MIDDLEWARE
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
