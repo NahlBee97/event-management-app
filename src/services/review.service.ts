@@ -2,7 +2,7 @@ import prisma from "../lib/prisma";
 
 export async function GetReviewByEventIdSevice(params: string) {
     try {
-        const review = await prisma.review.findFirst({
+        const review = await prisma.reviews.findFirst({
             where: {
                 event_id: Number(params)
             }
@@ -20,7 +20,7 @@ export async function GetReviewByEventIdSevice(params: string) {
 
 export async function GetReviewByUserIdservice(params: string) {
     try {
-        const review = await prisma.review.findFirst({
+        const review = await prisma.reviews.findFirst({
             where: {
                 user_id: Number(params)
             }

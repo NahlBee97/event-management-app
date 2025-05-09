@@ -20,9 +20,9 @@ app.use('/api/event', EventRouter)
 
 app.use('/api/voucher', VoucherRouter)
 
-app.use('/api/review', ReviewRouter)
+app.use('/api/reviews', ReviewRouter)
 
-app.use("/api", UserRouter);
+app.use("/api/users", UserRouter);
 
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

@@ -2,7 +2,7 @@ import prisma from "../lib/prisma";
 
 export async function GetVoucherByEventIdServices(params: string) {
     try {
-        const voucher = await prisma.vouchers.findFirst({
+        const voucher = await prisma.event_vouchers.findFirst({
             where: {
                 event_id: Number(params)
             },

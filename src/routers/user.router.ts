@@ -3,6 +3,6 @@ import { FindUserByIdController } from "../controllers/user.controller";
 
 const router = Router();
 
-router.get("/users/:id", FindUserByIdController );
+router.get("/:id", FindUserByIdController );
 
 export default router;
