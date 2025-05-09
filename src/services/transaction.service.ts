@@ -75,8 +75,20 @@ async function EditTransactionById(id: number, status: transaction_statuses) {
   }
 }
 
+async function DeleteTransactionById(id: number) {
+  try {
+    await prisma.transactions.delete({
+      where: {
+        id,
+      }
+    });
+  } catch (err) {
+    throw err;
+  }
+}
+
 // services
-async function CreateTransactionService(bodyData: IBodyTransaction) {
+export async function CreateTransactionService(bodyData: IBodyTransaction) {
   try {
     const newTransaction = await CreateTransaction(bodyData);
 
@@ -86,7 +98,7 @@ async function CreateTransactionService(bodyData: IBodyTransaction) {
   }
 }
 
-async function FindTransactionByUserIdService(userId: number) {
+export async function FindTransactionByUserIdService(userId: number) {
   try {
     const transactions = await FindTransactionByUserId(userId);
 
@@ -96,7 +108,7 @@ async function FindTransactionByUserIdService(userId: number) {
   }
 }
 
-async function FindTransactionByIdService(id: number) {
+export async function FindTransactionByIdService(id: number) {
   try {
     const transactions = await FindTransactionById(id);
 
@@ -106,7 +118,7 @@ async function FindTransactionByIdService(id: number) {
   }
 }
 
-async function EditTransactionByIdService(id: number, status: transaction_statuses) {
+export async function EditTransactionByIdService(id: number, status: transaction_statuses) {
   try {
     const updatedTransaction = await EditTransactionById(id, status);
 
@@ -116,4 +128,13 @@ async function EditTransactionByIdService(id: number, status: transaction_status
   }
 }
 
-export { CreateTransactionService, FindTransactionByUserIdService, EditTransactionByIdService, FindTransactionByIdService };
+export async function DeleteTransactionByIdService(
+  id: number
+) {
+  try {
+    await DeleteTransactionById(id);
+
+  } catch (err) {
+    throw err;
+  }
+}

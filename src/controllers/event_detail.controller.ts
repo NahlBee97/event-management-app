@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { GetEventDetailByIdSevice } from "../services/event_detail.services";
+import { GetEventDetailByIdService } from "../services/event_detail.services";
 
 export async function GetEventDetailByIdController(req: Request, res: Response, next: NextFunction) {
     try {
         const eventId = req?.params?.id
 
-        const event = await GetEventDetailByIdSevice(eventId);
+        const event = await GetEventDetailByIdService(eventId);
 
         res.status(200).send({
             success: true,

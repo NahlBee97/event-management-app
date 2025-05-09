@@ -6,15 +6,19 @@ import { SearchEventController } from "../controllers/search_events.controller";
 
 const router = Router();
 
-router.get('/', GetAllEventController)
-router.get('/search', SearchEventController)
-router.get('/detail/:id', GetEventDetailByIdController)
-router.get('/categories', GetAllCategoriesController);
-
+//create
 router.post('/', CreateEventController);
 
+//read
+router.get('/', GetAllEventController)
+router.get("/search", SearchEventController);
+router.get("/detail/:id", GetEventDetailByIdController);
+router.get("/categories", GetAllCategoriesController);
+
+//update
 router.post('/:id', EditEventByIdController);
 
+//delete
 router.delete('/:id', DeleteEventByIdController);
 
 export default router;

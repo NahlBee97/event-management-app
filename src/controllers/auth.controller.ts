@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { LoginService, RegisterService } from "../services/auth.service";
 
-async function RegisterController(
+export async function RegisterController(
   req: Request,
   res: Response,
   next: NextFunction
@@ -19,22 +19,20 @@ async function RegisterController(
   }
 }
 
-async function LoginController(
+export async function LoginController(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
   try {
     const bodyData = req.body;
-    const newUser = await LoginService(bodyData);
+    const user = await LoginService(bodyData);
 
     res.status(200).send({
       message: `Login success`,
-      data: newUser,
+      data: user,
     });
   } catch (err) {
     next(err);
   }
 }
-
-export { RegisterController, LoginController };

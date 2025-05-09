@@ -1,9 +1,14 @@
 import { Router } from "express";
-import { FindCouponByUserIdController } from "../controllers/coupon.controller";
+import { FindCouponByUserIdController, UpdateCouponStatusController } from "../controllers/coupon.controller";
 
 const router = Router();
 
-// get coupon by user id
-router.get("/coupons/:user_id", FindCouponByUserIdController);
+//create is in register logic
+
+// read
+router.get("/:user_id", FindCouponByUserIdController);
+
+// update coupon status
+router.put("/:user_id", UpdateCouponStatusController)
 
 export default router;

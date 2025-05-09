@@ -20,7 +20,7 @@ async function FindUserReview(user_id: number, event_id: number) {
 
 export async function GetReviewByEventIdSevice(params: string) {
     try {
-        const review = await prisma.reviews.findFirst({
+        const review = await prisma.reviews.findMany({
             where: {
                 event_id: Number(params)
             },
@@ -102,4 +102,16 @@ export async function UpdateReviewService(params: IReview) {
     } catch (error) {
         throw error
     }
+}
+
+export async function DeleteReviewService(id: number) {
+  try {
+    await prisma.reviews.delete({
+        where: {
+            id
+        }
+    })
+  } catch (error) {
+    throw error;
+  }
 }

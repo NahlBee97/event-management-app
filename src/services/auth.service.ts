@@ -8,7 +8,7 @@ async function FindUserByEmail(email: string) {
   try {
     const user = await prisma.users.findFirst({
       where: {
-        email: email,
+        email,
       },
     });
     return user;
@@ -19,11 +19,21 @@ async function FindUserByEmail(email: string) {
 
 async function Register(bodyData: IRegister) {
   try {
-    const { first_name, last_name, email, password, role_id } = bodyData;
+    const { first_name, last_name, email, password, role } = bodyData;
 
     const user = await FindUserByEmail(email);
 
     if (user) throw new Error("The email you are using is already exist");
+
+    const roleData = await prisma.roles.findFirst({
+      where: {
+        name: role,
+      }
+    })
+
+    if (!roleData) throw new Error("Cannot get role id");
+
+    const role_id = roleData.id;
 
     return await prisma.$transaction(async (t) => {
       function referralGenerator() {
@@ -163,22 +173,26 @@ async function Login(bodyData: ILogin) {
 
     if (!checkPass) throw new Error("Wrong Password");
 
+    const userRole = await prisma.roles.findFirst({
+      select: {name: true},
+      where: {id: user.role_id}
+    })
     const payload = {
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
-      role: user.role_id,
+      role: userRole?.name,
     };
 
     const token = sign(payload, String(SECRET_KEY), { expiresIn: "1h" });
 
-    return { user: payload, token };
+    return {user: payload, token};
   } catch (err) {
     throw err;
   }
 }
 
-async function RegisterService(bodyData: IRegister) {
+export async function RegisterService(bodyData: IRegister) {
   try {
     const newUser = await Register(bodyData);
 
@@ -197,7 +211,7 @@ async function RegisterService(bodyData: IRegister) {
   }
 }
 
-async function LoginService(bodyData: ILogin) {
+export async function LoginService(bodyData: ILogin) {
   try {
     const user = await Login(bodyData);
 
@@ -206,5 +220,3 @@ async function LoginService(bodyData: ILogin) {
     throw err;
   }
 }
-
-export { RegisterService, LoginService };

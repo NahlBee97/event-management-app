@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { FindCouponByUserIdService } from "../services/coupon.service";
+import { FindCouponByUserIdService, UpdateCouponStatusService } from "../services/coupon.service";
 
-async function FindCouponByUserIdController(
+export async function FindCouponByUserIdController(
   req: Request,
   res: Response,
   next: NextFunction
@@ -19,4 +19,21 @@ async function FindCouponByUserIdController(
   }
 }
 
-export { FindCouponByUserIdController };
+export async function UpdateCouponStatusController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = parseInt(req.params.user_id);
+    const status = req.body.used;
+    const updatedCoupon = await UpdateCouponStatusService(userId, status);
+
+    res.status(200).send({
+      message: "Update coupon status success",
+      data: updatedCoupon,
+    });
+  } catch (err) {
+    next(err);
+  }
+}

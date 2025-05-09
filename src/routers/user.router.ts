@@ -1,12 +1,20 @@
 import { Router } from "express";
-import { EditUserByIdController, FindUserByIdController } from "../controllers/user.controller";
+import {
+  DeleteUserByIdController,
+  EditUserByIdController,
+  FindUserByIdController,
+  GetAllUserController,
+} from "../controllers/user.controller";
 
 const router = Router();
 
-router.get("/:id", FindUserByIdController );
+// get all users
+router.get("/", GetAllUserController);
 // get user by id
-router.get("/auth/users/:id", FindUserByIdController);
+router.get("/:id", FindUserByIdController);
 // edit user by id
-router.put("/auth/users/:id", EditUserByIdController);
+router.put("/:id", EditUserByIdController);
+// delete user by id
+router.delete("/:id", DeleteUserByIdController);
 
 export default router;

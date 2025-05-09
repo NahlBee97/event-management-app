@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { CreateTransactionService, EditTransactionByIdService, FindTransactionByIdService, FindTransactionByUserIdService } from "../services/transaction.service";
-import { FindUserByIdService } from "../services/user.service";
+import { CreateTransactionService, DeleteTransactionByIdService, EditTransactionByIdService, FindTransactionByIdService, FindTransactionByUserIdService } from "../services/transaction.service";
 
-async function CreateTransactionController(
+export async function CreateTransactionController(
   req: Request,
   res: Response,
   next: NextFunction
@@ -20,7 +19,7 @@ async function CreateTransactionController(
   }
 }
 
-async function FindTransactionByUserIdController(
+export async function FindTransactionByUserIdController(
   req: Request,
   res: Response,
   next: NextFunction
@@ -38,7 +37,7 @@ async function FindTransactionByUserIdController(
   }
 }
 
-async function FindTransactionByIdController(
+export async function FindTransactionByIdController(
   req: Request,
   res: Response,
   next: NextFunction
@@ -56,7 +55,7 @@ async function FindTransactionByIdController(
   }
 }
 
-async function EditTransactionByIdController(
+export async function EditTransactionByIdController(
   req: Request,
   res: Response,
   next: NextFunction
@@ -75,4 +74,19 @@ async function EditTransactionByIdController(
   }
 }
 
-export { CreateTransactionController, FindTransactionByUserIdController, EditTransactionByIdController, FindTransactionByIdController };
+export async function DeleteTransactionByIdController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const id = parseInt(req.params.id);
+    await DeleteTransactionByIdService(id);
+
+    res.status(200).send({
+      message: `Delete transaction by id ${id} success`,
+    });
+  } catch (err) {
+    next(err);
+  }
+}

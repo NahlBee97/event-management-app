@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { CreateEventService, DeleteEventByIdService, EditEventByIdService, GetAllEventService } from "../services/event.service";
-import { GetEventDetailByIdSevice } from "../services/event_detail.services";
+import { GetEventDetailByIdService } from "../services/event_detail.services";
 
 export async function GetAllEventController(req: Request, res: Response, next: NextFunction) {
     try {
@@ -57,7 +57,7 @@ export async function DeleteEventByIdController(
 ) {
   try {
     const eventId = parseInt(req.params.id)
-    const deletedEvent = await GetEventDetailByIdSevice(req.params.id);
+    const deletedEvent = await GetEventDetailByIdService(req.params.id);
     await DeleteEventByIdService(eventId)
 
     res.status(200).send({
