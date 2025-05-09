@@ -3,7 +3,7 @@ import { IReview } from "../interfaces/review.interface";
 
 async function FindUserReview(user_id: number, event_id: number) {
     try {
-        const existingReview = await prisma.review.findUnique({
+        const existingReview = await prisma.reviews.findUnique({
             where: {
                 user_id_event_id: {
                     user_id,
@@ -20,7 +20,7 @@ async function FindUserReview(user_id: number, event_id: number) {
 
 export async function GetReviewByEventIdSevice(params: string) {
     try {
-        const review = await prisma.review.findMany({
+        const review = await prisma.reviews.findMany({
             where: {
                 event_id: Number(params)
             },
@@ -45,7 +45,7 @@ export async function GetReviewByEventIdSevice(params: string) {
 
 export async function GetReviewByUserIdservice(params: string) {
     try {
-        const review = await prisma.review.findFirst({
+        const review = await prisma.reviews.findFirst({
             where: {
                 user_id: Number(params)
             }
@@ -64,7 +64,7 @@ export async function CreateReviewService(params: IReview) {
         const isExistReview = await FindUserReview(params.user_id, params.event_id)
         if (isExistReview) throw new Error("Your review already exist, you had reviewed this event!")
 
-        const newReview = await prisma.review.create({
+        const newReview = await prisma.reviews.create({
             data: {
                 user_id: params?.user_id,
                 event_id: params?.event_id,
@@ -86,7 +86,7 @@ export async function UpdateReviewService(params: IReview) {
         const isExistReview = await FindUserReview(user_id, event_id)
         if (!isExistReview) throw new Error("Review not found")
 
-        const updateReview = await prisma.review.update({
+        const updateReview = await prisma.reviews.update({
             where: {
                 user_id_event_id: {
                     user_id,
@@ -106,7 +106,7 @@ export async function UpdateReviewService(params: IReview) {
 
 export async function DeleteReviewService(id: number) {
   try {
-    await prisma.review.delete({
+    await prisma.reviews.delete({
         where: {
             id
         }

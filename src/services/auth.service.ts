@@ -25,6 +25,16 @@ async function Register(bodyData: IRegister) {
 
     if (user) throw new Error("The email you are using is already exist");
 
+    const roleData = await prisma.roles.findFirst({
+      where: {
+        name: role,
+      }
+    })
+
+    if (!roleData) throw new Error("Cannot get role id");
+
+    const role_id = roleData.id;
+
     return await prisma.$transaction(async (t) => {
       function referralGenerator() {
         const yearNow = String(new Date().getFullYear());
@@ -42,7 +52,7 @@ async function Register(bodyData: IRegister) {
           last_name: last_name,
           email: email,
           password: hashedPassword,
-          role: role,
+          role_id: role_id,
           referral_code: referralGenerator(),
         },
       });
@@ -163,11 +173,15 @@ async function Login(bodyData: ILogin) {
 
     if (!checkPass) throw new Error("Wrong Password");
 
+    const userRole = await prisma.roles.findFirst({
+      select: {name: true},
+      where: {id: user.role_id}
+    })
     const payload = {
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
-      role: user.role,
+      role: userRole?.name,
     };
 
     const token = sign(payload, String(SECRET_KEY), { expiresIn: "1h" });

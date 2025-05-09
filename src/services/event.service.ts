@@ -96,14 +96,14 @@ export async function DeleteEventByIdService(
         })
     }
     //delete riview
-    const eventReview = await prisma.review.findFirst({
+    const eventReview = await prisma.reviews.findFirst({
       where: {
         event_id: eventId,
       },
     });
 
     if (eventReview) {
-      await prisma.review.deleteMany({
+      await prisma.reviews.deleteMany({
         where: {
           event_id: eventId,
         },

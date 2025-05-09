@@ -25,7 +25,7 @@ async function EditUserById(userId: number, body: IBodyUser) {
       last_name,
       email,
       password,
-      role,
+      role_id,
       profile_picture,
     } = body;
     
@@ -36,7 +36,7 @@ async function EditUserById(userId: number, body: IBodyUser) {
         last_name: last_name || existedUser?.last_name,
         email: email || existedUser?.email,
         password: password || existedUser?.password,
-        role: role || existedUser?.role,
+        role_id: role_id || existedUser?.role_id,
         profile_picture: profile_picture || existedUser?.profile_picture,
       },
     });
@@ -72,7 +72,7 @@ async function DeleteUserById(userId: number) {
     });
     
     // Delete related data from the review table
-    await prisma.review.deleteMany({
+    await prisma.reviews.deleteMany({
       where: {
         user_id: userId,
       },
