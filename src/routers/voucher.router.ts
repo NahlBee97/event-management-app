@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { GetVoucherByEventIdController } from "../controllers/voucher.controller";
+import { GetVoucherByEventIdController, GetVoucherByUserIdController } from "../controllers/voucher.controller";
 
 const router = Router();
 
-router.get('/:id', GetVoucherByEventIdController)
+router.get('/event/:id', GetVoucherByEventIdController)
+router.get('/user/:id', GetVoucherByUserIdController)
 
 
 export default router;

@@ -6,6 +6,15 @@ export async function GetEventDetailByIdSevice(params: string) {
             where: {
                 id: Number(params), // ganti dengan ID yang kamu cari
             },
+            include: {
+                event_category: true,
+                users: {
+                    select: {
+                        first_name: true,
+                        last_name: true,
+                    },
+                },
+            },
         });
         if (!event) throw new Error(`Event with id ${params} not found`)
 
