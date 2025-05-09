@@ -86,7 +86,7 @@ export async function UpdateReviewService(params: IReview) {
         const isExistReview = await FindUserReview(user_id, event_id)
         if (!isExistReview) throw new Error("Review not found")
 
-        const updateReview = await prisma.review.update({
+        const updateReview = await prisma.reviews.update({
             where: {
                 user_id_event_id: {
                     user_id,
