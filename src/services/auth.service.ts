@@ -19,7 +19,7 @@ async function FindUserByEmail(email: string) {
 
 async function Register(bodyData: IRegister) {
   try {
-    const { first_name, last_name, email, password, role } = bodyData;
+    const { first_name, last_name, email, password, role_id } = bodyData;
 
     const user = await FindUserByEmail(email);
 
@@ -42,7 +42,7 @@ async function Register(bodyData: IRegister) {
           last_name: last_name,
           email: email,
           password: hashedPassword,
-          role: role,
+          role_id: role_id,
           referral_code: referralGenerator(),
         },
       });
@@ -167,7 +167,7 @@ async function Login(bodyData: ILogin) {
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
-      role: user.role,
+      role: user.role_id,
     };
 
     const token = sign(payload, String(SECRET_KEY), { expiresIn: "1h" });
