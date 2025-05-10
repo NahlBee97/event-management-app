@@ -9,7 +9,7 @@ async function FindUserByEmail(email: string) {
     const user = await prisma.users.findFirst({
       where: {
         email,
-      },
+      }
     });
     return user;
   } catch (err) {
@@ -23,7 +23,7 @@ async function Register(bodyData: IRegister) {
 
     const user = await FindUserByEmail(email);
 
-    if (user) throw new Error("The email you are using is already exist");
+    if (user) throw new Error("Email already registered");
 
     const roleData = await prisma.roles.findFirst({
       where: {
@@ -177,6 +177,7 @@ async function Login(bodyData: ILogin) {
       select: {name: true},
       where: {id: user.role_id}
     })
+    
     const payload = {
       email: user.email,
       first_name: user.first_name,

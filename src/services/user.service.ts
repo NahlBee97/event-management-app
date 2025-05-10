@@ -110,17 +110,12 @@ async function DeleteUserById(userId: number) {
   }
 }
 
-export async function GetAllUserService(params: string | null) {
-  let users;
-  if (params) {
-    users = await prisma.users.findFirst({
-      where: {
-        email: params
-      }
-    });
-  } else {
-    users = await prisma.users.findMany();
-  }
+export async function GetAllUserService() {
+
+  const users = await prisma.users.findMany();
+
+  if (!users) throw new Error("No Users Yet");
+  
   return users;
 }
 
