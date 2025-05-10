@@ -3,7 +3,7 @@ import prisma from "../lib/prisma";
 
 export async function SearchEventService(params: ISearchEvent) {
     try {
-        const { category_id, start_date, end_date, min_price, max_price } = params
+        const { category_id, start_date, end_date, min_price, max_price, organizer_id } = params
         const filters: any = {};
 
         if (category_id) {
@@ -29,6 +29,10 @@ export async function SearchEventService(params: ISearchEvent) {
             };
         }
 
+        if (organizer_id) {
+            filters.organizer_id = Number(organizer_id);
+        }
+
         const events = await prisma.events.findMany({
             where: {
                 ...filters
@@ -37,7 +41,6 @@ export async function SearchEventService(params: ISearchEvent) {
                 event_category: true,
             },
         });
-
 
         if (!events) throw new Error(`Event not found`)
 
