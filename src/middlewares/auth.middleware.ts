@@ -15,7 +15,6 @@ export async function VerifyToken(req: Request, res: Response, next: NextFunctio
 
         req.data = verifyUser as IUserReqParam;
 
-
         next();
     } catch (err) {
         next(err);

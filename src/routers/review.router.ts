@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { CreateReviewController, DeleteReviewController, GetReviewByEventIdController, GetReviewByUserIdController, UpdateReviewController } from "../controllers/review.controller";
 import { VerifyToken } from "../middlewares/auth.middleware";
+import { reviewSchema } from "../schemas/review.schema";
+import { ReqValidator } from "../middlewares/validator.middleware";
 
 const router = Router();
 
@@ -8,9 +10,9 @@ const router = Router();
 router.get('/event/:id', GetReviewByEventIdController)
 router.get('/user/:id', GetReviewByUserIdController)
 //create
-router.post('/', VerifyToken, CreateReviewController)
+router.post('/', ReqValidator(reviewSchema), VerifyToken, CreateReviewController)
 //update
-router.put('/', VerifyToken, UpdateReviewController)
+router.put('/', ReqValidator(reviewSchema), VerifyToken, UpdateReviewController)
 //delete
 router.delete('/:id', VerifyToken, DeleteReviewController)
 
