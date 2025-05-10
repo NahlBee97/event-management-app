@@ -9,7 +9,7 @@ export interface IBodyEvent {
   price: number;
 }
 export interface ISearchEvent {
-  organizer: string;
+  organizer_id: string;
   category_id: string;
   start_date: string; // ISO date string
   end_date: string;   // ISO date string
