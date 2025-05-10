@@ -4,7 +4,7 @@ export async function GetEventDetailByIdSevice(params: string) {
     try {
         const event = await prisma.events.findUnique({
             where: {
-                id: Number(params), // ganti dengan ID yang kamu cari
+                id: Number(params)
             },
             include: {
                 event_category: true,
