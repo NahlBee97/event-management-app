@@ -2,5 +2,9 @@ import "dotenv/config";
 
 export const {
   PORT,
-  SECRET_KEY, FE_URL
+  SECRET_KEY,
+  FE_URL,
+  CLOUDINARY_NAME,
+  CLOUDINARY_KEY,
+  CLOUDINARY_SECRET,
 } = process.env;

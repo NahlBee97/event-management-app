@@ -1,3 +1,4 @@
+import { Multer } from "multer";
 
 export interface IUser {
   id: string;
@@ -16,8 +17,13 @@ export interface IBodyUser {
   last_name: string;
   email: string;
   password: string;
-  role_id: number;
+  role: string;
   profile_picture: string;
   referral_code: string;
   created_at: Date;
+}
+
+export interface IUpdateUser {
+  file: Express.Multer.File,
+  email: string
 }

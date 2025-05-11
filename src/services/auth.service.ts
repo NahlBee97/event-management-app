@@ -4,7 +4,7 @@ import prisma from "../lib/prisma";
 import { hash, genSaltSync, compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
 
-async function FindUserByEmail(email: string) {
+export async function FindUserByEmail(email: string) {
   try {
     const user = await prisma.users.findFirst({
       where: {
@@ -25,16 +25,6 @@ async function Register(bodyData: IRegister) {
 
     if (user) throw new Error("Email already registered");
 
-    const roleData = await prisma.roles.findFirst({
-      where: {
-        name: role,
-      }
-    })
-
-    if (!roleData) throw new Error("Cannot get role id");
-
-    const role_id = roleData.id;
-
     return await prisma.$transaction(async (t) => {
       function referralGenerator() {
         const yearNow = String(new Date().getFullYear());
@@ -52,7 +42,7 @@ async function Register(bodyData: IRegister) {
           last_name: last_name,
           email: email,
           password: hashedPassword,
-          role_id: role_id,
+          role: role,
           referral_code: referralGenerator(),
         },
       });
@@ -173,16 +163,11 @@ async function Login(bodyData: ILogin) {
 
     if (!checkPass) throw new Error("Wrong Password");
 
-    const userRole = await prisma.roles.findFirst({
-      select: {name: true},
-      where: {id: user.role_id}
-    })
-    
     const payload = {
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
-      role: userRole?.name,
+      role: user.role,
     };
 
     const token = sign(payload, String(SECRET_KEY), { expiresIn: "1h" });
