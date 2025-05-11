@@ -31,8 +31,8 @@ export async function LoginController(
     const data = await LoginService(bodyData);
 
     res.status(200).cookie("access_token", data.token).send({
-      message: "Login Berhasil",
-      user: data.user,
+      message: "Login Success",
+      data: data.user,
     });
   } catch (err) {
     next(err);

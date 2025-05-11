@@ -1,3 +1,4 @@
+import { Console } from "console";
 import { IBodyUser } from "../interfaces/user.interface";
 import prisma from "../lib/prisma";
 import { cloudinaryRemove, cloudinaryUpload } from "../utils/cloudinary";

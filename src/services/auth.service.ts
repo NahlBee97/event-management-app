@@ -168,6 +168,7 @@ async function Login(bodyData: ILogin) {
       first_name: user.first_name,
       last_name: user.last_name,
       role: user.role,
+      profile_picture: user.profile_picture,
     };
 
     const token = sign(payload, String(SECRET_KEY), { expiresIn: "1h" });
