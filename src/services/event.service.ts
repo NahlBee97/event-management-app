@@ -28,6 +28,14 @@ export async function CreateEventService(
       organizer_id,
     } = bodyData;
 
+    const now = new Date();
+    const startDate = new Date(start_date);
+    const sixHoursInMs = 6 * 60 * 60 * 1000;
+
+    if (startDate.getTime() - now.getTime() < sixHoursInMs) {
+      throw new Error("Start date must be at least 6 hours from now");
+    }
+
     const newEvent = await prisma.events.create({
       data: {
         name,
