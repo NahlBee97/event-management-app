@@ -63,6 +63,7 @@ model users {
   profile_picture                                       String?         @db.VarChar(100)
   referral_code                                         String?         @unique @db.VarChar(30)
   created_at                                            DateTime?       @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
+  isverivied                                            Boolean?        @default(false)
   coupons                                               coupons[]
   events                                                events[]
   points                                                points?

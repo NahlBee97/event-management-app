@@ -1,15 +1,19 @@
-import { SECRET_KEY } from "../config";
+import { FE_URL, SECRET_KEY } from "../config";
 import { ILogin, IRegister } from "../interfaces/auth.interface";
 import prisma from "../lib/prisma";
 import { hash, genSaltSync, compare } from "bcrypt";
-import { sign } from "jsonwebtoken";
+import { JwtPayload, sign, verify } from "jsonwebtoken";
+import { Transporter } from "../utils/nodemailer";
+import handlebars from "handlebars";
+import path from "path";
+import fs from "fs";
 
 export async function FindUserByEmail(email: string) {
   try {
     const user = await prisma.users.findFirst({
       where: {
         email,
-      }
+      },
     });
     return user;
   } catch (err) {
@@ -51,9 +55,46 @@ async function Register(bodyData: IRegister) {
         email: newUser.email,
       };
 
-      const token = sign(payload, String(SECRET_KEY), { expiresIn: "15m" });
+      const token = sign(payload, String(SECRET_KEY), { expiresIn: "24h" });
+
+      const templatePath = path.join(
+        __dirname,
+        "../templates",
+        "register-template.hbs"
+      );
+
+      const templateSource = fs.readFileSync(templatePath, "utf-8");
+      const compiledTemplate = handlebars.compile(templateSource);
+      const html = compiledTemplate({
+        email,
+        fe_url: `${FE_URL}/verify?token=${token}`,
+      });
+
+      await Transporter.sendMail({
+        from: "EOHelper",
+        to: email,
+        subject: "Welcome",
+        html,
+      });
 
       return newUser;
+    });
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function VerifyAccount(token: string) {
+  try {
+    const { email } = verify(token, String(SECRET_KEY)) as JwtPayload;
+
+    await prisma.users.update({
+      where: {
+        email,
+      },
+      data: {
+        isverivied: true,
+      },
     });
   } catch (err) {
     throw err;
@@ -115,12 +156,12 @@ async function UpdatePoint(bodyData: IRegister) {
     referrerPoint.points += 10000;
     await prisma.points.update({
       where: {
-        user_id: referrer.id   
+        user_id: referrer.id,
       },
       data: {
-        points: referrerPoint.points
-      }
-    })
+        points: referrerPoint.points,
+      },
+    });
   } catch (err) {
     throw err;
   }
@@ -131,21 +172,21 @@ async function GiveCoupon(bodyData: IRegister) {
   try {
     const { email } = bodyData;
     const user = await FindUserByEmail(email);
-    if (!user) throw new Error("Can not find user")
+    if (!user) throw new Error("Can not find user");
 
     function CodeGenerator() {
-        const code = "COUPON" + user?.first_name;
+      const code = "COUPON" + user?.first_name;
 
-        return code;
-      }
+      return code;
+    }
 
     await prisma.coupons.create({
       data: {
         user_id: user.id,
         discount_percentage: 5,
-        code: CodeGenerator() 
-      }
-    })
+        code: CodeGenerator(),
+      },
+    });
   } catch (err) {
     throw err;
   }
@@ -173,7 +214,7 @@ async function Login(bodyData: ILogin) {
 
     const token = sign(payload, String(SECRET_KEY), { expiresIn: "1h" });
 
-    return {user: payload, token};
+    return { user: payload, token };
   } catch (err) {
     throw err;
   }
@@ -193,6 +234,14 @@ export async function RegisterService(bodyData: IRegister) {
     }
 
     return newUser;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function VerifyAccountService(token: string) {
+  try {
+    await VerifyAccount(token);
   } catch (err) {
     throw err;
   }

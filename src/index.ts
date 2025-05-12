@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: `${FE_URL}`, // Allow requests from this origin
-    methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], // Specify allowed methods
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   })
 );

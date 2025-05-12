@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { LoginService, RegisterService } from "../services/auth.service";
+import { LoginService, RegisterService, VerifyAccountService } from "../services/auth.service";
 import { IUserReqParam } from "../custom";
 import { UpdateUserService } from "../services/user.service";
 
@@ -56,6 +56,19 @@ export async function UpdateProfileController(
     res.status(200).send({
       message: `Update Profile success`,
     });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function VerifyAccountController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const token = req.body.token;
+    await VerifyAccountService(token);
   } catch (err) {
     next(err);
   }
