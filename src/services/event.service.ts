@@ -31,10 +31,13 @@ export async function CreateEventService(
     const now = new Date();
     const startDate = new Date(start_date);
     const endDate = new Date(end_date);
-    const sixHoursInMs = 6 * 60 * 60 * 1000;
 
-    if (startDate.getTime() - now.getTime() < sixHoursInMs) {
-      throw new Error("Start date must be at least 6 hours from now.");
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    if (startDate < tomorrow) {
+      throw new Error("Start date must be at least tomorrow.");
     }
 
     if (endDate.getTime() < startDate.getTime()) {
