@@ -6,6 +6,7 @@ import { voucherSchema } from "../schemas/voucher.schema";
 
 const router = Router();
 
+//read
 router.get('/events/:id', GetVoucherByEventIdController)
 router.get('/users/:id', VerifyToken, GetVoucherByUserIdController)
 // create voucher
