@@ -71,8 +71,6 @@ model users {
   referral_logs_referral_logs_user_idTousers            referral_logs[] @relation("referral_logs_user_idTousers")
   reviews                                               reviews[]
   transactions                                          transactions[]
-  roles                                                 roles?          @relation(fields: [rolesId], references: [id])
-  rolesId                                               Int?
 }
 
 model event_vouchers {
@@ -101,12 +99,6 @@ model reviews {
   users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_user_id_fkey")
 
   @@unique([user_id, event_id], map: "review_user_id_event_id_key")
-}
-
-model roles {
-  id    Int        @id @default(autoincrement())
-  name  user_roles
-  users users[]
 }
 
 model user_vouchers {

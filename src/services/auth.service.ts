@@ -54,7 +54,7 @@ async function Register(bodyData: IRegister) {
         last_name: last_name,
         email: email,
         password: hashedPassword,
-        role: role,
+        // role_id: role_id,
         referral_code: referralGenerator(),
       },
     });

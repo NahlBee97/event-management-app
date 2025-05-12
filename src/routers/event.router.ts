@@ -7,11 +7,8 @@ import { EOGuard, VerifyToken } from "../middlewares/auth.middleware";
 
 const router = Router();
 
-router.post('/', CreateEventController);
-//create
-router.post('/', VerifyToken, EOGuard, CreateEventController);
-
 //read
+router.post('/', CreateEventController);
 router.get('/', GetAllEventController)
 router.get("/search", SearchEventController);
 router.get("/detail/:id", GetEventDetailByIdController);
@@ -21,7 +18,8 @@ router.delete('/:id', DeleteEventByIdController);
 
 //update
 router.put('/:id', VerifyToken, EOGuard, EditEventByIdController);
-
+//create
+router.post('/', VerifyToken, EOGuard, CreateEventController);
 //delete
 router.delete('/:id', VerifyToken, EOGuard, DeleteEventByIdController);
 
