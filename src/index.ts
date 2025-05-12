@@ -16,9 +16,12 @@ import AuthRouter from "./routers/auth.router";
 const port = PORT;
 const app: Application = express();
 
-app.use(cors({
-  origin: 'http://localhost:3000',
-}));
+app.use(
+  cors({
+    origin: FE_URL,
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
