@@ -20,27 +20,6 @@ model coupons {
   users               users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model events {
-  id              Int               @id @default(autoincrement())
-  organizer_id    Int?
-  name            String            @db.VarChar(100)
-  description     String
-  category_id     Int?
-  location        String            @default("online") @db.VarChar(20)
-  start_date      DateTime          @db.Timestamp(6)
-  end_date        DateTime          @db.Timestamp(6)
-  total_seats     Int
-  remaining_seats Int
-  price           Decimal           @db.Decimal(10, 2)
-  created_at      DateTime?         @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
-  path            String?           @db.VarChar(255)
-  event_vouchers  event_vouchers[]
-  event_category  event_categories? @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users           users?            @relation(fields: [organizer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  reviews         reviews[]
-  transactions    transactions[]
-}
-
 model points {
   id         Int       @id @default(autoincrement())
   user_id    Int       @unique(map: "unique_user_id")
@@ -94,13 +73,6 @@ model users {
   roles                                                 roles           @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model event_categories {
-  id       Int      @id @default(autoincrement())
-  category String   @unique @db.VarChar(30)
-  path     String?  @db.VarChar(255)
-  events   events[]
-}
-
 model event_vouchers {
   id                  Int      @id(map: "vouchers_pkey") @default(autoincrement())
   event_id            Int
@@ -140,6 +112,34 @@ model user_vouchers {
   user_id    Int
   voucher_id Int
   claimed_at DateTime? @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
+}
+
+model events {
+  id              Int               @id @default(autoincrement())
+  organizer_id    Int?
+  name            String            @db.VarChar(100)
+  description     String
+  category_id     Int?
+  location        String            @default("online") @db.VarChar(20)
+  start_date      DateTime          @db.Timestamp(6)
+  end_date        DateTime          @db.Timestamp(6)
+  total_seats     Int
+  remaining_seats Int
+  price           Decimal           @db.Decimal(10, 2)
+  created_at      DateTime?         @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
+  path            String?           @db.VarChar(255)
+  event_vouchers  event_vouchers[]
+  event_category  event_categories? @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users           users?            @relation(fields: [organizer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reviews         reviews[]
+  transactions    transactions[]
+}
+
+model event_categories {
+  id       Int      @id @default(autoincrement())
+  category String   @unique @db.VarChar(30)
+  path     String?  @db.VarChar(255)
+  events   events[]
 }
 
 enum user_roles {
