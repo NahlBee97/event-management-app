@@ -29,56 +29,54 @@ async function Register(bodyData: IRegister) {
 
     if (user) throw new Error("Email already registered");
 
-    return await prisma.$transaction(async (t) => {
-      function referralGenerator() {
-        const yearNow = String(new Date().getFullYear());
-        const referral_code = "REF" + first_name.toUpperCase() + yearNow;
+    const salt = genSaltSync(10);
+    const hashedPassword = await hash(password, salt);
 
-        return referral_code;
-      }
+    function referralGenerator() {
+      const yearNow = String(new Date().getFullYear());
+      const referral_code = "REF" + first_name.toUpperCase() + yearNow;
 
-      const salt = genSaltSync(10);
-      const hashedPassword = await hash(password, salt);
+      return referral_code;
+    }
 
-      const newUser = await t.users.create({
-        data: {
-          first_name: first_name,
-          last_name: last_name,
-          email: email,
-          password: hashedPassword,
-          role: role,
-          referral_code: referralGenerator(),
-        },
-      });
+    const templatePath = path.join(
+      __dirname,
+      "../templates",
+      "register-template.hbs"
+    );
 
-      const payload = {
-        email: newUser.email,
-      };
+    const templateSource = fs.readFileSync(templatePath, "utf-8");
+    const compiledTemplate = handlebars.compile(templateSource);
 
-      const token = sign(payload, String(SECRET_KEY), { expiresIn: "24h" });
-
-      const templatePath = path.join(
-        __dirname,
-        "../templates",
-        "register-template.hbs"
-      );
-
-      const templateSource = fs.readFileSync(templatePath, "utf-8");
-      const compiledTemplate = handlebars.compile(templateSource);
-      const html = compiledTemplate({
-        email,
-        fe_url: `${FE_URL}/verify?token=${token}`,
-      });
-
-      await Transporter.sendMail({
-        from: "EOHelper",
-        to: email,
-        subject: "Welcome",
-        html,
-      });
-
-      return newUser;
+    const newUser = await prisma.users.create({
+      data: {
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+        password: hashedPassword,
+        role: role,
+        referral_code: referralGenerator(),
+      },
     });
+
+    const payload = {
+      email: newUser.email,
+    };
+
+    const token = sign(payload, String(SECRET_KEY), { expiresIn: "24h" });
+    const html = compiledTemplate({
+      email,
+      fe_url: `${FE_URL}/verify?token=${token}`,
+    });
+
+    await Transporter.sendMail({
+      from: "EOHelper",
+      to: email,
+      subject: "Welcome",
+      html,
+    });
+
+    return newUser;
   } catch (err) {
     throw err;
   }
