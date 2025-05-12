@@ -216,6 +216,7 @@ async function Login(bodyData: ILogin) {
     if (!checkPass) throw new Error("Wrong Password");
 
     const payload = {
+      id: user.id,
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
