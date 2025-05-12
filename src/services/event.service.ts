@@ -30,10 +30,15 @@ export async function CreateEventService(
 
     const now = new Date();
     const startDate = new Date(start_date);
+    const endDate = new Date(end_date);
     const sixHoursInMs = 6 * 60 * 60 * 1000;
 
     if (startDate.getTime() - now.getTime() < sixHoursInMs) {
-      throw new Error("Start date must be at least 6 hours from now");
+      throw new Error("Start date must be at least 6 hours from now.");
+    }
+
+    if (endDate.getTime() < startDate.getTime()) {
+      throw new Error("End date cannot be earlier than start date.");
     }
 
     const newEvent = await prisma.events.create({
