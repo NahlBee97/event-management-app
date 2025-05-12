@@ -1,8 +1,9 @@
+import { Console } from "console";
 import { IBodyUser } from "../interfaces/user.interface";
 import prisma from "../lib/prisma";
+import { cloudinaryRemove, cloudinaryUpload } from "../utils/cloudinary";
+import { FindUserByEmail } from "./auth.service";
 
-
-//find user by id function
 export async function FindUserById(userId: number) {
   try {
     const user = await prisma.users.findFirst({
@@ -25,10 +26,10 @@ async function EditUserById(userId: number, body: IBodyUser) {
       last_name,
       email,
       password,
-      role_id,
+      role,
       profile_picture,
     } = body;
-    
+
     const editedUser = await prisma.users.update({
       where: { id: userId },
       data: {
@@ -36,13 +37,13 @@ async function EditUserById(userId: number, body: IBodyUser) {
         last_name: last_name || existedUser?.last_name,
         email: email || existedUser?.email,
         password: password || existedUser?.password,
-        role_id: role_id || existedUser?.role_id,
+        role: role || existedUser?.role,
         profile_picture: profile_picture || existedUser?.profile_picture,
       },
     });
-    
+
     return editedUser;
-    
+
   } catch (err) {
     throw err;
   }
@@ -56,28 +57,28 @@ async function DeleteUserById(userId: number) {
         user_id: userId,
       },
     });
-    
+
     // Delete related data from the coupons table
     await prisma.coupons.deleteMany({
       where: {
         user_id: userId,
       },
     });
-    
+
     // Delete related data from the points table
     await prisma.points.deleteMany({
       where: {
         user_id: userId,
       },
     });
-    
+
     // Delete related data from the review table
     await prisma.reviews.deleteMany({
       where: {
         user_id: userId,
       },
     });
-    
+
     // Delete related data from the transactions table
     await prisma.transactions.deleteMany({
       where: {
@@ -98,7 +99,7 @@ async function DeleteUserById(userId: number) {
         user_id: userId,
       },
     });
-    
+
     // Finally, delete the user record
     await prisma.users.delete({
       where: {
@@ -110,17 +111,12 @@ async function DeleteUserById(userId: number) {
   }
 }
 
-export async function GetAllUserService(params: string | null) {
-  let users;
-  if (params) {
-    users = await prisma.users.findFirst({
-      where: {
-        email: params
-      }
-    });
-  } else {
-    users = await prisma.users.findMany();
-  }
+export async function GetAllUserService() {
+
+  const users = await prisma.users.findMany();
+
+  if (!users) throw new Error("No Users Yet");
+  
   return users;
 }
 
@@ -141,6 +137,33 @@ export async function EditUserByIdService(userId: number, body: IBodyUser) {
     return editedUser;
 
   } catch (err) {
+    throw err;
+  }
+}
+
+export async function UpdateUserService(file: Express.Multer.File, email: string) {
+  let url = "";
+  try {
+    const checkUser = await FindUserByEmail(email);
+    if (!checkUser) throw new Error("User not found");
+
+    await prisma.$transaction(async (t) => {
+      const { secure_url } = await cloudinaryUpload(file);
+      url = secure_url;
+      const splitUrl = secure_url.split("/");
+      const fileName = splitUrl[splitUrl.length - 1];
+
+      await t.users.update({
+        where: {
+          id: checkUser.id
+        },
+        data: {
+          profile_picture: fileName
+        }
+      })
+    })
+  } catch (err) {
+    await cloudinaryRemove(url);
     throw err;
   }
 }

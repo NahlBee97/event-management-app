@@ -1,10 +1,14 @@
-import { SECRET_KEY } from "../config";
+import { FE_URL, SECRET_KEY } from "../config";
 import { ILogin, IRegister } from "../interfaces/auth.interface";
 import prisma from "../lib/prisma";
 import { hash, genSaltSync, compare } from "bcrypt";
-import { sign } from "jsonwebtoken";
+import { JwtPayload, sign, verify } from "jsonwebtoken";
+import { Transporter } from "../utils/nodemailer";
+import handlebars from "handlebars";
+import path from "path";
+import fs from "fs";
 
-async function FindUserByEmail(email: string) {
+export async function FindUserByEmail(email: string) {
   try {
     const user = await prisma.users.findFirst({
       where: {
@@ -23,47 +27,72 @@ async function Register(bodyData: IRegister) {
 
     const user = await FindUserByEmail(email);
 
-    if (user) throw new Error("The email you are using is already exist");
+    if (user) throw new Error("Email already registered");
 
-    const roleData = await prisma.roles.findFirst({
+    const salt = genSaltSync(10);
+    const hashedPassword = await hash(password, salt);
+
+    function referralGenerator() {
+      const yearNow = String(new Date().getFullYear());
+      const referral_code = "REF" + first_name.toUpperCase() + yearNow;
+
+      return referral_code;
+    }
+
+    const templatePath = path.join(
+      __dirname,
+      "../templates",
+      "register-template.hbs"
+    );
+
+    const templateSource = fs.readFileSync(templatePath, "utf-8");
+    const compiledTemplate = handlebars.compile(templateSource);
+
+    const newUser = await prisma.users.create({
+      data: {
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+        password: hashedPassword,
+        role: role,
+        referral_code: referralGenerator(),
+      },
+    });
+
+    const payload = {
+      email: newUser.email,
+    };
+
+    const token = sign(payload, String(SECRET_KEY), { expiresIn: "24h" });
+    const html = compiledTemplate({
+      email,
+      fe_url: `${FE_URL}/verify?token=${token}`,
+    });
+
+    await Transporter.sendMail({
+      from: "EOHelper",
+      to: email,
+      subject: "Welcome",
+      html,
+    });
+
+    return newUser;
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function VerifyAccount(token: string) {
+  try {
+    const { email } = verify(token, String(SECRET_KEY)) as JwtPayload;
+
+    await prisma.users.update({
       where: {
-        name: role,
-      }
-    })
-
-    if (!roleData) throw new Error("Cannot get role id");
-
-    const role_id = roleData.id;
-
-    return await prisma.$transaction(async (t) => {
-      function referralGenerator() {
-        const yearNow = String(new Date().getFullYear());
-        const referral_code = "REF" + first_name.toUpperCase() + yearNow;
-
-        return referral_code;
-      }
-
-      const salt = genSaltSync(10);
-      const hashedPassword = await hash(password, salt);
-
-      const newUser = await t.users.create({
-        data: {
-          first_name: first_name,
-          last_name: last_name,
-          email: email,
-          password: hashedPassword,
-          role_id: role_id,
-          referral_code: referralGenerator(),
-        },
-      });
-
-      const payload = {
-        email: newUser.email,
-      };
-
-      const token = sign(payload, String(SECRET_KEY), { expiresIn: "15m" });
-
-      return newUser;
+        email,
+      },
+      data: {
+        isverivied: true,
+      },
     });
   } catch (err) {
     throw err;
@@ -108,6 +137,19 @@ async function UpdatePoint(bodyData: IRegister) {
       },
     });
     if (!referrer) throw new Error("Can not find referrer");
+    //create default referrer point
+    const currentDate = new Date();
+    const expiredAt = new Date(
+      currentDate.setMonth(currentDate.getMonth() + 3)
+    );
+
+    await prisma.points.create({
+      data: {
+        user_id: referrer.id,
+        points: 0,
+        expired_at: expiredAt,
+      },
+    });
     //see referrer point
     let referrerPoint = await prisma.points.findFirst({
       select: {
@@ -125,12 +167,12 @@ async function UpdatePoint(bodyData: IRegister) {
     referrerPoint.points += 10000;
     await prisma.points.update({
       where: {
-        user_id: referrer.id   
+        user_id: referrer.id,
       },
       data: {
-        points: referrerPoint.points
-      }
-    })
+        points: referrerPoint.points,
+      },
+    });
   } catch (err) {
     throw err;
   }
@@ -141,21 +183,21 @@ async function GiveCoupon(bodyData: IRegister) {
   try {
     const { email } = bodyData;
     const user = await FindUserByEmail(email);
-    if (!user) throw new Error("Can not find user")
+    if (!user) throw new Error("Can not find user");
 
     function CodeGenerator() {
-        const code = "COUPON" + user?.first_name;
+      const code = "COUPON" + user?.first_name;
 
-        return code;
-      }
+      return code;
+    }
 
     await prisma.coupons.create({
       data: {
         user_id: user.id,
         discount_percentage: 5,
-        code: CodeGenerator() 
-      }
-    })
+        code: CodeGenerator(),
+      },
+    });
   } catch (err) {
     throw err;
   }
@@ -173,20 +215,18 @@ async function Login(bodyData: ILogin) {
 
     if (!checkPass) throw new Error("Wrong Password");
 
-    const userRole = await prisma.roles.findFirst({
-      select: {name: true},
-      where: {id: user.role_id}
-    })
     const payload = {
+      id: user.id,
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
-      role: userRole?.name,
+      role: user.role,
+      profile_picture: user.profile_picture,
     };
 
     const token = sign(payload, String(SECRET_KEY), { expiresIn: "1h" });
 
-    return {user: payload, token};
+    return { user: payload, token };
   } catch (err) {
     throw err;
   }
@@ -206,6 +246,14 @@ export async function RegisterService(bodyData: IRegister) {
     }
 
     return newUser;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function VerifyAccountService(token: string) {
+  try {
+    await VerifyAccount(token);
   } catch (err) {
     throw err;
   }

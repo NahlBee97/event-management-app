@@ -1,7 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from "express";
-import cors from "cors";
+import cors from 'cors';
 
-import { PORT } from "./config";
+import { FE_URL, PORT } from "./config";
 
 import UserRouter from "./routers/user.router";
 import EventRouter from "./routers/event.router";
@@ -13,16 +13,23 @@ import CouponRouter from "./routers/coupon.router";
 import TransactionRouter from "./routers/transaction.router";
 import AuthRouter from "./routers/auth.router";
 
-const port = PORT || 8080;
+const port = PORT;
 const app: Application = express();
+
+app.use(
+  cors({
+    origin: FE_URL,
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
 // Use CORS middleware
 app.use(
   cors({
-    origin: "http://localhost:3000", // Allow requests from this origin
-    methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
+    origin: `${FE_URL}`, // Allow requests from this origin
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], // Specify allowed methods
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   })
 );

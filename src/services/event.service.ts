@@ -2,13 +2,13 @@ import { IBodyEvent } from "../interfaces/event.interface";
 import prisma from "../lib/prisma";
 
 export async function GetAllEventService() {
-    try {
-        const events = await prisma.events.findMany();
-        if (!events) throw new Error('Events not found')
-        return events
-    } catch (err) {
-        throw err;
-    }
+  try {
+    const events = await prisma.events.findMany();
+    if (!events) throw new Error('Events not found')
+    return events
+  } catch (err) {
+    throw err;
+  }
 }
 
 export async function CreateEventService(
@@ -24,18 +24,48 @@ export async function CreateEventService(
       total_seats,
       remaining_seats,
       price,
+      path,
+      organizer_id,
     } = bodyData;
+
+    const now = new Date();
+    const startDate = new Date(start_date);
+    const endDate = new Date(end_date);
+
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    if (startDate < tomorrow) {
+      throw new Error("Start date must be at least tomorrow.");
+    }
+
+    if (endDate.getTime() < startDate.getTime()) {
+      throw new Error("End date cannot be earlier than start date.");
+    }
 
     const newEvent = await prisma.events.create({
       data: {
-        name: name,
-        description: description,
-        category_id: category_id,
-        start_date: start_date,
-        end_date: end_date,
-        total_seats: total_seats,
-        remaining_seats: remaining_seats,
-        price: price,
+        name,
+        description,
+        category_id,
+        start_date,
+        end_date,
+        total_seats,
+        remaining_seats,
+        price,
+        location: 'Online',
+        path,
+        organizer_id,
+      },
+      include: {
+        event_category: true,
+        users: {
+          select: {
+            first_name: true,
+            last_name: true,
+          },
+        },
       },
     });
     return newEvent;
@@ -46,30 +76,30 @@ export async function CreateEventService(
 
 export async function EditEventByIdService(eventId: number, bodyData: IBodyEvent) {
   try {
-    const { name, description, category_id, start_date, end_date, total_seats, remaining_seats, price } = bodyData;
-
+    const { name, description, category_id, start_date, end_date, total_seats, remaining_seats, price, path } = bodyData;
     const event = await prisma.events.findFirst({
-        where: {
-            id: eventId
-        }
+      where: {
+        id: eventId
+      }
     });
 
     if (!event) throw new Error("This event does not exist");
 
     const updatedEvent = await prisma.events.update({
-        where: {
-            id: eventId
-        },
-        data: {
-            name: name || event.name,
-            description: description || event.description,
-            category_id: category_id || event.category_id,
-            start_date: start_date || event.start_date,
-            end_date: end_date || event.end_date,
-            total_seats: total_seats || event.total_seats,
-            remaining_seats: remaining_seats || event.remaining_seats,
-            price: price || event.price
-        }
+      where: {
+        id: eventId
+      },
+      data: {
+        name: name || event.name,
+        description: description || event.description,
+        category_id: category_id || event.category_id,
+        start_date: start_date || event.start_date,
+        end_date: end_date || event.end_date,
+        total_seats: total_seats || event.total_seats,
+        remaining_seats: remaining_seats || event.remaining_seats,
+        price: price || event.price,
+        path: path || event.path
+      }
     });
     return updatedEvent;
   } catch (err) {
@@ -83,17 +113,17 @@ export async function DeleteEventByIdService(
   try {
     //delete voucher
     const eventVoucher = await prisma.event_vouchers.findFirst({
-        where: {
-            event_id: eventId
-        }
+      where: {
+        event_id: eventId
+      }
     })
 
     if (eventVoucher) {
-        await prisma.event_vouchers.deleteMany({
-            where: {
-                event_id: eventId
-            }
-        })
+      await prisma.event_vouchers.deleteMany({
+        where: {
+          event_id: eventId
+        }
+      })
     }
     //delete riview
     const eventReview = await prisma.reviews.findFirst({
@@ -110,19 +140,19 @@ export async function DeleteEventByIdService(
       });
     }
     //delete transaction
-     const eventTransaction = await prisma.transactions.findFirst({
-       where: {
-         event_id: eventId,
-       },
-     });
+    const eventTransaction = await prisma.transactions.findFirst({
+      where: {
+        event_id: eventId,
+      },
+    });
 
-     if (eventTransaction) {
-       await prisma.transactions.deleteMany({
-         where: {
-           event_id: eventId,
-         },
-       });
-     }
+    if (eventTransaction) {
+      await prisma.transactions.deleteMany({
+        where: {
+          event_id: eventId,
+        },
+      });
+    }
     //delete event
     await prisma.events.delete({
       where: {

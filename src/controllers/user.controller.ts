@@ -5,6 +5,7 @@ import {
   DeleteUserByIdService,
   GetAllUserService,
 } from "../services/user.service";
+import { IUserReqParam } from "../custom";
 
 export async function GetAllUserController(
   req: Request,
@@ -12,15 +13,8 @@ export async function GetAllUserController(
   next: NextFunction
 ) {
   try {
-    const params = req.query.email as string;
-    const users = await GetAllUserService(params);
+    const users = await GetAllUserService();
 
-    if (params) {
-      res.status(200).send({
-        message: `Get user by email ${params} success`,
-        data: users,
-      });
-    } else 
     res.status(200).send({
       message: `Get all user success`,
       data: users,
