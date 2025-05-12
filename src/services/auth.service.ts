@@ -23,7 +23,7 @@ export async function FindUserByEmail(email: string) {
 
 async function Register(bodyData: IRegister) {
   try {
-    const { first_name, last_name, email, password, role_id } = bodyData;
+    const { first_name, last_name, email, password, role } = bodyData;
 
     const user = await FindUserByEmail(email);
 
@@ -54,7 +54,7 @@ async function Register(bodyData: IRegister) {
         last_name: last_name,
         email: email,
         password: hashedPassword,
-        // role_id: role_id,
+        role: role,
         referral_code: referralGenerator(),
       },
     });
