@@ -7,6 +7,8 @@ export interface IBodyEvent {
   total_seats: number;
   remaining_seats: number;
   price: number;
+  path: string;
+  organizer_id: number;
 }
 export interface ISearchEvent {
   organizer_id: string;

@@ -24,18 +24,32 @@ export async function CreateEventService(
       total_seats,
       remaining_seats,
       price,
+      path,
+      organizer_id,
     } = bodyData;
 
     const newEvent = await prisma.events.create({
       data: {
-        name: name,
-        description: description,
-        category_id: category_id,
-        start_date: start_date,
-        end_date: end_date,
-        total_seats: total_seats,
-        remaining_seats: remaining_seats,
-        price: price,
+        name,
+        description,
+        category_id,
+        start_date,
+        end_date,
+        total_seats,
+        remaining_seats,
+        price,
+        location: 'Online',
+        path,
+        organizer_id,
+      },
+      include: {
+        event_category: true,
+        users: {
+          select: {
+            first_name: true,
+            last_name: true,
+          },
+        },
       },
     });
     return newEvent;
@@ -46,8 +60,7 @@ export async function CreateEventService(
 
 export async function EditEventByIdService(eventId: number, bodyData: IBodyEvent) {
   try {
-    const { name, description, category_id, start_date, end_date, total_seats, remaining_seats, price } = bodyData;
-
+    const { name, description, category_id, start_date, end_date, total_seats, remaining_seats, price, path } = bodyData;
     const event = await prisma.events.findFirst({
       where: {
         id: eventId
@@ -68,7 +81,8 @@ export async function EditEventByIdService(eventId: number, bodyData: IBodyEvent
         end_date: end_date || event.end_date,
         total_seats: total_seats || event.total_seats,
         remaining_seats: remaining_seats || event.remaining_seats,
-        price: price || event.price
+        price: price || event.price,
+        path: path || event.path
       }
     });
     return updatedEvent;

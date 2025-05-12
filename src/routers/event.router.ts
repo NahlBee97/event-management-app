@@ -13,7 +13,7 @@ router.get('/categories', GetAllCategoriesController);
 
 router.post('/', CreateEventController);
 
-router.post('/:id', EditEventByIdController);
+router.put('/:id', EditEventByIdController);
 
 router.delete('/:id', DeleteEventByIdController);
 
