@@ -35,7 +35,7 @@ async function EditUserById(userId: number, body: IBodyUser) {
         last_name: last_name || existedUser?.last_name,
         email: email || existedUser?.email,
         password: password || existedUser?.password,
-        role: role || existedUser?.role,
+        //ole_id: role || existedUser?.role_id,
         profile_picture: profile_picture || existedUser?.profile_picture,
       },
     });
@@ -74,4 +74,4 @@ async function EditUserByIdService(userId: number, body: IBodyUser) {
 
 export { FindUserByIdService, EditUserByIdService };
 // export often use function
-export { FindUserById } ;
+export { FindUserById };

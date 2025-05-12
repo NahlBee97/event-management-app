@@ -19,7 +19,7 @@ async function FindUserByEmail(email: string) {
 
 async function Register(bodyData: IRegister) {
   try {
-    const { first_name, last_name, email, password, role } = bodyData;
+    const { first_name, last_name, email, password, role_id } = bodyData;
 
     const user = await FindUserByEmail(email);
 
@@ -42,7 +42,7 @@ async function Register(bodyData: IRegister) {
           last_name: last_name,
           email: email,
           password: hashedPassword,
-          role: role,
+          role_id: role_id,
           referral_code: referralGenerator(),
         },
       });
@@ -115,7 +115,7 @@ async function UpdatePoint(bodyData: IRegister) {
     referrerPoint.points += 10000;
     await prisma.points.update({
       where: {
-        user_id: referrer.id   
+        user_id: referrer.id
       },
       data: {
         points: referrerPoint.points
@@ -134,16 +134,16 @@ async function GiveCoupon(bodyData: IRegister) {
     if (!user) throw new Error("Can not find user")
 
     function CodeGenerator() {
-        const code = "COUPON" + user?.first_name;
+      const code = "COUPON" + user?.first_name;
 
-        return code;
-      }
+      return code;
+    }
 
     await prisma.coupons.create({
       data: {
         user_id: user.id,
         discount_percentage: 5,
-        code: CodeGenerator() 
+        code: CodeGenerator()
       }
     })
   } catch (err) {
@@ -167,7 +167,7 @@ async function Login(bodyData: ILogin) {
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
-      role: user.role,
+      role: user.role_id,
     };
 
     const token = sign(payload, String(SECRET_KEY), { expiresIn: "1h" });
