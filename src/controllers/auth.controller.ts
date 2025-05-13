@@ -34,7 +34,7 @@ export async function LoginController(
     res
       .status(200)
       .cookie("access_token", data.token, {
-        sameSite: "lax",
+        sameSite: "none",
         httpOnly: true
       })
       .send({
