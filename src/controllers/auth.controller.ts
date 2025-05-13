@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { LoginService, RegisterService, VerifyAccountService } from "../services/auth.service";
 import { IUserReqParam } from "../custom";
 import { UpdateUserService } from "../services/user.service";
+import { FE_URL } from "../config";
 
 export async function RegisterController(
   req: Request,
@@ -33,9 +34,10 @@ export async function LoginController(
     res
       .status(200)
       .cookie("access_token", data.token, {
-        httpOnly: true,
+        sameSite: "none",
         secure: true,
-        sameSite: "none", // or 'strict'/'none'
+        httpOnly: true,
+        domain: FE_URL,
       })
       .send({
         message: "Login Success",
