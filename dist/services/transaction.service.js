@@ -21,16 +21,12 @@ const prisma_1 = __importDefault(require("../lib/prisma"));
 function CreateTransaction(bodyData) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { user_id, event_id, ticket_quantity, payment_date, payment_proof, payment_method, status } = bodyData;
+            const { user_id, event_id, ticket_quantity } = bodyData;
             const newTransaction = yield prisma_1.default.transactions.create({
                 data: {
                     user_id: user_id,
                     event_id: event_id,
                     ticket_quantity: ticket_quantity,
-                    payment_date: payment_date,
-                    payment_proof: payment_proof,
-                    payment_method: payment_method,
-                    status: status
                 },
             });
             return newTransaction;

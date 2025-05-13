@@ -12,31 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetEventDetailByIdService = GetEventDetailByIdService;
-const prisma_1 = __importDefault(require("../lib/prisma"));
-function GetEventDetailByIdService(params) {
+exports.VerifyUserTask = VerifyUserTask;
+const node_cron_1 = __importDefault(require("node-cron"));
+function VerifyUserTask() {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const event = yield prisma_1.default.events.findUnique({
-                where: {
-                    id: Number(params)
-                },
-                include: {
-                    event_category: true,
-                    users: {
-                        select: {
-                            first_name: true,
-                            last_name: true,
-                        },
-                    },
-                },
-            });
-            if (!event)
-                throw new Error(`Event with id ${params} not found`);
-            return event;
-        }
-        catch (err) {
-            throw err;
-        }
+        // * pertama menandakan menit (0-59)
+        // * kedua menandakan jam (0-23)
+        // * ketiga menandakan hari dalam bulan (1-31)
+        // * keempat menandakan bulan (1-12)
+        // * kelima menandakan hari dalam minggu (0-7)
+        node_cron_1.default.schedule("*/15 * * * *", () => {
+        });
     });
 }

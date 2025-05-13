@@ -17,7 +17,7 @@ const prisma_1 = __importDefault(require("../lib/prisma"));
 function GetAllCategoriesService() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const categories = yield prisma_1.default.event_category.findMany();
+            const categories = yield prisma_1.default.event_categories.findMany();
             if (!categories)
                 throw new Error("Categories not found");
             return categories;

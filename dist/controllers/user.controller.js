@@ -17,19 +17,11 @@ const user_service_1 = require("../services/user.service");
 function GetAllUserController(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const params = req.query.email;
-            const users = yield (0, user_service_1.GetAllUserService)(params);
-            if (params) {
-                res.status(200).send({
-                    message: `Get user by email ${params} success`,
-                    data: users,
-                });
-            }
-            else
-                res.status(200).send({
-                    message: `Get all user success`,
-                    data: users,
-                });
+            const users = yield (0, user_service_1.GetAllUserService)();
+            res.status(200).send({
+                message: `Get all user success`,
+                data: users,
+            });
         }
         catch (err) {
             next(err);
