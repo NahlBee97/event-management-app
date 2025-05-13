@@ -30,10 +30,17 @@ export async function LoginController(
     const bodyData = req.body;
     const data = await LoginService(bodyData);
 
-    res.status(200).cookie("access_token", data.token).send({
-      message: "Login Success",
-      data: data.user,
-    });
+    res
+      .status(200)
+      .cookie("access_token", data.token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none", // or 'strict'/'none'
+      })
+      .send({
+        message: "Login Success",
+        data: data.user,
+      });
   } catch (err) {
     next(err);
   }
