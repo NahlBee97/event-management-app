@@ -44,10 +44,10 @@ model transactions {
   user_id         Int
   event_id        Int
   ticket_quantity Int
-  payment_date    DateTime?            @db.Timestamp(6)
+  payment_date    DateTime?            @default(now()) @db.Timestamptz(6)
   payment_proof   String?              @db.VarChar(100)
-  payment_method  String?              @db.VarChar(30)
-  status          transaction_statuses
+  payment_method  String?              @default("bank-transfer") @db.VarChar(30)
+  status          transaction_statuses @default(waiting_for_payment)
   created_at      DateTime             @default(dbgenerated("timezone('Asia/Jakarta'::text, now())")) @db.Timestamp(6)
   events          events               @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users           users                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
