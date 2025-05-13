@@ -41,8 +41,6 @@ export async function LoginController(
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        domain:
-          FE_URL,
       })
       .send({
         message: "Login Success",
