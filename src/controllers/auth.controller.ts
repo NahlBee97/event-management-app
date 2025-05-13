@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { LoginService, RegisterService, VerifyAccountService } from "../services/auth.service";
+import {
+  LoginService,
+  RegisterService,
+  VerifyAccountService,
+} from "../services/auth.service";
 import { IUserReqParam } from "../custom";
 import { UpdateUserService } from "../services/user.service";
 import { FE_URL } from "../config";
@@ -34,9 +38,11 @@ export async function LoginController(
     res
       .status(200)
       .cookie("access_token", data.token, {
-        sameSite: "none",
+        httpOnly: true,
         secure: true,
-        httpOnly: true
+        sameSite: "none",
+        domain:
+          FE_URL,
       })
       .send({
         message: "Login Success",
@@ -58,7 +64,7 @@ export async function UpdateProfileController(
 
     if (!file) throw new Error("File not found");
     if (!email) throw new Error("Email not found");
-    
+
     await UpdateUserService(file, email);
 
     res.status(200).send({
