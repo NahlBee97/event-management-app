@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import {
   LoginService,
   RegisterService,
+  ResetPasswordService,
   VerifyAccountService,
+  VerifyResetService,
 } from "../services/auth.service";
 import { IUserReqParam } from "../custom";
 import { UpdateUserService } from "../services/user.service";
@@ -77,6 +79,40 @@ export async function VerifyAccountController(
   try {
     const token = req.body.token;
     await VerifyAccountService(token);
+
+    res.status(200).send({
+      message: `Verify account success`,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function ResetPasswordController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { new_password, token } = req.body;
+    await ResetPasswordService(new_password, token);
+
+    res.status(200).send({
+      message: `Reset password success`,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function VerifyResetController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { email } = req.body;
+    await VerifyResetService(email);
   } catch (err) {
     next(err);
   }
