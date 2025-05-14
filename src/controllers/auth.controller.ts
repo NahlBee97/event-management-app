@@ -37,11 +37,7 @@ export async function LoginController(
 
     res
       .status(200)
-      .cookie("access_token", data.token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-      })
+      .cookie("access_token", data.token)
       .send({
         message: "Login Success",
         data: data.user,
