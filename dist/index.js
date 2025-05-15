@@ -23,10 +23,14 @@ app.use((0, cors_1.default)({
 }));
 app.use(express_1.default.json());
 // Use CORS middleware
+const allowedOrigins = [
+    config_1.FE_URL,
+    config_1.FE_LOCAL_URL, // (optional, for local dev)
+];
 app.use((0, cors_1.default)({
-    origin: `${config_1.FE_URL}`, // Allow requests from this origin
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], // Specify allowed methods
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    origin: config_1.FE_URL && config_1.FE_LOCAL_URL,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true, // (if using cookies/auth)
 }));
 app.use("/api/auth", auth_router_1.default);
 app.use("/api/users", user_router_1.default);
