@@ -24,7 +24,7 @@ app.use((0, cors_1.default)({
 app.use(express_1.default.json());
 // Use CORS middleware
 app.use((0, cors_1.default)({
-    origin: config_1.FE_URL || config_1.FE_LOCAL_URL,
+    origin: config_1.FE_URL,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true, // (if using cookies/auth)
 }));
