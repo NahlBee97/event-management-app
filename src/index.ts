@@ -26,10 +26,6 @@ app.use(
 app.use(express.json());
 
 // Use CORS middleware
-const allowedOrigins = [
-  FE_URL,
-  FE_LOCAL_URL, // (optional, for local dev)
-];
 
 app.use(
   cors({
