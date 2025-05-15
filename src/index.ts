@@ -29,7 +29,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: FE_URL && FE_LOCAL_URL,
+    origin: FE_URL || FE_LOCAL_URL,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true, // (if using cookies/auth)
   })
