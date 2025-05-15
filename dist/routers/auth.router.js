@@ -11,4 +11,6 @@ router.post("/register", (0, validator_middleware_1.ReqValidator)(user_schema_1.
 router.post("/login", (0, validator_middleware_1.ReqValidator)(user_schema_1.loginSchema), auth_controller_1.LoginController);
 router.patch("/avatar", auth_middleware_1.VerifyToken, (0, multer_1.Multer)().single("file"), auth_controller_1.UpdateProfileController);
 router.patch("/verify", auth_controller_1.VerifyAccountController);
+router.post("/resetverify", auth_controller_1.VerifyResetController);
+router.patch("/reset", auth_controller_1.ResetPasswordController);
 exports.default = router;

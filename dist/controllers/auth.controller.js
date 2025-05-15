@@ -13,6 +13,8 @@ exports.RegisterController = RegisterController;
 exports.LoginController = LoginController;
 exports.UpdateProfileController = UpdateProfileController;
 exports.VerifyAccountController = VerifyAccountController;
+exports.ResetPasswordController = ResetPasswordController;
+exports.VerifyResetController = VerifyResetController;
 const auth_service_1 = require("../services/auth.service");
 const user_service_1 = require("../services/user.service");
 function RegisterController(req, res, next) {
@@ -35,7 +37,10 @@ function LoginController(req, res, next) {
         try {
             const bodyData = req.body;
             const data = yield (0, auth_service_1.LoginService)(bodyData);
-            res.status(200).cookie("access_token", data.token).send({
+            res
+                .status(200)
+                .cookie("access_token", data.token)
+                .send({
                 message: "Login Success",
                 data: data.user,
             });
@@ -69,6 +74,34 @@ function VerifyAccountController(req, res, next) {
         try {
             const token = req.body.token;
             yield (0, auth_service_1.VerifyAccountService)(token);
+            res.status(200).send({
+                message: `Verify account success`,
+            });
+        }
+        catch (err) {
+            next(err);
+        }
+    });
+}
+function ResetPasswordController(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { new_password, token } = req.body;
+            yield (0, auth_service_1.ResetPasswordService)(new_password, token);
+            res.status(200).send({
+                message: `Reset password success`,
+            });
+        }
+        catch (err) {
+            next(err);
+        }
+    });
+}
+function VerifyResetController(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { email } = req.body;
+            yield (0, auth_service_1.VerifyResetService)(email);
         }
         catch (err) {
             next(err);

@@ -16,6 +16,8 @@ exports.FindUserByEmail = FindUserByEmail;
 exports.RegisterService = RegisterService;
 exports.VerifyAccountService = VerifyAccountService;
 exports.LoginService = LoginService;
+exports.ResetPasswordService = ResetPasswordService;
+exports.VerifyResetService = VerifyResetService;
 const config_1 = require("../config");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const bcrypt_1 = require("bcrypt");
@@ -71,6 +73,7 @@ function Register(bodyData) {
             };
             const token = (0, jsonwebtoken_1.sign)(payload, String(config_1.SECRET_KEY), { expiresIn: "24h" });
             const html = compiledTemplate({
+                first_name,
                 email,
                 fe_url: `${config_1.FE_URL}/verify?token=${token}`,
             });
@@ -234,6 +237,55 @@ function Login(bodyData) {
         }
     });
 }
+function VerifyReset(email) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const templatePath = path_1.default.join(__dirname, "../templates", "verify-reset-template.hbs");
+            const payload = {
+                email,
+            };
+            const token = (0, jsonwebtoken_1.sign)(payload, String(config_1.SECRET_KEY), { expiresIn: "24h" });
+            const templateSource = fs_1.default.readFileSync(templatePath, "utf-8");
+            const compiledTemplate = handlebars_1.default.compile(templateSource);
+            const html = compiledTemplate({
+                email,
+                fe_url: `${config_1.FE_URL}/reset-password?token=${token}`,
+            });
+            yield nodemailer_1.Transporter.sendMail({
+                from: "EOHelper",
+                to: email,
+                subject: "Reset Password",
+                html,
+            });
+        }
+        catch (err) {
+            throw err;
+        }
+    });
+}
+function ResetPassword(new_password, token) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { email } = (0, jsonwebtoken_1.verify)(token, String(config_1.SECRET_KEY));
+            const user = yield FindUserByEmail(email);
+            if (!user)
+                throw new Error("User does not exist");
+            const salt = (0, bcrypt_1.genSaltSync)(10);
+            const hashedPassword = yield (0, bcrypt_1.hash)(new_password, salt);
+            yield prisma_1.default.users.update({
+                where: {
+                    email,
+                },
+                data: {
+                    password: hashedPassword,
+                },
+            });
+        }
+        catch (err) {
+            throw err;
+        }
+    });
+}
 function RegisterService(bodyData) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -268,6 +320,26 @@ function LoginService(bodyData) {
         try {
             const user = yield Login(bodyData);
             return user;
+        }
+        catch (err) {
+            throw err;
+        }
+    });
+}
+function ResetPasswordService(new_password, token) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield ResetPassword(new_password, token);
+        }
+        catch (err) {
+            throw err;
+        }
+    });
+}
+function VerifyResetService(email) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield VerifyReset(email);
         }
         catch (err) {
             throw err;
