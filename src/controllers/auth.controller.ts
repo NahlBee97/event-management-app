@@ -1,7 +1,14 @@
 import { Request, Response, NextFunction } from "express";
-import { LoginService, RegisterService, VerifyAccountService } from "../services/auth.service";
+import {
+  LoginService,
+  RegisterService,
+  ResetPasswordService,
+  VerifyAccountService,
+  VerifyResetService,
+} from "../services/auth.service";
 import { IUserReqParam } from "../custom";
 import { UpdateUserService } from "../services/user.service";
+import { FE_URL } from "../config";
 
 export async function RegisterController(
   req: Request,
@@ -30,10 +37,13 @@ export async function LoginController(
     const bodyData = req.body;
     const data = await LoginService(bodyData);
 
-    res.status(200).cookie("access_token", data.token).send({
-      message: "Login Success",
-      data: data.user,
-    });
+    res
+      .status(200)
+      .cookie("access_token", data.token)
+      .send({
+        message: "Login Success",
+        data: data.user,
+      });
   } catch (err) {
     next(err);
   }
@@ -50,7 +60,7 @@ export async function UpdateProfileController(
 
     if (!file) throw new Error("File not found");
     if (!email) throw new Error("Email not found");
-    
+
     await UpdateUserService(file, email);
 
     res.status(200).send({
@@ -69,6 +79,40 @@ export async function VerifyAccountController(
   try {
     const token = req.body.token;
     await VerifyAccountService(token);
+
+    res.status(200).send({
+      message: `Verify account success`,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function ResetPasswordController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { new_password, token } = req.body;
+    await ResetPasswordService(new_password, token);
+
+    res.status(200).send({
+      message: `Reset password success`,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function VerifyResetController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { email } = req.body;
+    await VerifyResetService(email);
   } catch (err) {
     next(err);
   }

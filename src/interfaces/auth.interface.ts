@@ -15,3 +15,8 @@ export interface ILogin {
   email: string;
   password: string;
 }
+
+export default interface IResetPassword {
+  email: string;
+  new_password: string;
+}

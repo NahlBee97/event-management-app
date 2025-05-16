@@ -1,7 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from "express";
 import cors from 'cors';
 
-import { FE_URL, PORT } from "./config";
+import { FE_LOCAL_URL, FE_URL, PORT } from "./config";
 
 import UserRouter from "./routers/user.router";
 import EventRouter from "./routers/event.router";
@@ -26,11 +26,12 @@ app.use(
 app.use(express.json());
 
 // Use CORS middleware
+
 app.use(
   cors({
-    origin: `${FE_URL}`, // Allow requests from this origin
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], // Specify allowed methods
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    origin: FE_URL,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true, // (if using cookies/auth)
   })
 );
 

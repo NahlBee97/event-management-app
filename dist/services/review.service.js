@@ -21,7 +21,7 @@ const prisma_1 = __importDefault(require("../lib/prisma"));
 function FindUserReview(user_id, event_id) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const existingReview = yield prisma_1.default.review.findUnique({
+            const existingReview = yield prisma_1.default.reviews.findUnique({
                 where: {
                     user_id_event_id: {
                         user_id,
@@ -39,7 +39,7 @@ function FindUserReview(user_id, event_id) {
 function GetReviewByEventIdSevice(params) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const review = yield prisma_1.default.review.findMany({
+            const review = yield prisma_1.default.reviews.findMany({
                 where: {
                     event_id: Number(params)
                 },
@@ -65,7 +65,7 @@ function GetReviewByEventIdSevice(params) {
 function GetReviewByUserIdservice(params) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const review = yield prisma_1.default.review.findFirst({
+            const review = yield prisma_1.default.reviews.findFirst({
                 where: {
                     user_id: Number(params)
                 }
@@ -85,7 +85,7 @@ function CreateReviewService(params) {
             const isExistReview = yield FindUserReview(params.user_id, params.event_id);
             if (isExistReview)
                 throw new Error("Your review already exist, you had reviewed this event!");
-            const newReview = yield prisma_1.default.review.create({
+            const newReview = yield prisma_1.default.reviews.create({
                 data: {
                     user_id: params === null || params === void 0 ? void 0 : params.user_id,
                     event_id: params === null || params === void 0 ? void 0 : params.event_id,
@@ -107,7 +107,7 @@ function UpdateReviewService(params) {
             const isExistReview = yield FindUserReview(user_id, event_id);
             if (!isExistReview)
                 throw new Error("Review not found");
-            const updateReview = yield prisma_1.default.review.update({
+            const updateReview = yield prisma_1.default.reviews.update({
                 where: {
                     user_id_event_id: {
                         user_id,
@@ -129,7 +129,7 @@ function UpdateReviewService(params) {
 function DeleteReviewService(id) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield prisma_1.default.review.delete({
+            yield prisma_1.default.reviews.delete({
                 where: {
                     id
                 }

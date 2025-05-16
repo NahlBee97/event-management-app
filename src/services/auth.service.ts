@@ -1,5 +1,8 @@
 import { FE_URL, SECRET_KEY } from "../config";
-import { ILogin, IRegister } from "../interfaces/auth.interface";
+import IResetPassword, {
+  ILogin,
+  IRegister,
+} from "../interfaces/auth.interface";
 import prisma from "../lib/prisma";
 import { hash, genSaltSync, compare } from "bcrypt";
 import { JwtPayload, sign, verify } from "jsonwebtoken";
@@ -65,6 +68,7 @@ async function Register(bodyData: IRegister) {
 
     const token = sign(payload, String(SECRET_KEY), { expiresIn: "24h" });
     const html = compiledTemplate({
+      first_name,
       email,
       fe_url: `${FE_URL}/verify?token=${token}`,
     });
@@ -221,12 +225,71 @@ async function Login(bodyData: ILogin) {
       first_name: user.first_name,
       last_name: user.last_name,
       role: user.role,
+      referral_code: user.referral_code,
       profile_picture: user.profile_picture,
     };
 
     const token = sign(payload, String(SECRET_KEY), { expiresIn: "1h" });
 
     return { user: payload, token };
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function VerifyReset(email: string) {
+  try {
+    const templatePath = path.join(
+      __dirname,
+      "../templates",
+      "verify-reset-template.hbs"
+    );
+
+    const payload = {
+      email,
+    };
+
+    const token = sign(payload, String(SECRET_KEY), { expiresIn: "24h" });
+
+    const templateSource = fs.readFileSync(templatePath, "utf-8");
+    const compiledTemplate = handlebars.compile(templateSource);
+
+    const html = compiledTemplate({
+      email,
+      fe_url: `${FE_URL}/reset-password?token=${token}`,
+    });
+
+    await Transporter.sendMail({
+      from: "EOHelper",
+      to: email,
+      subject: "Reset Password",
+      html,
+    });
+
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function ResetPassword(new_password: string, token: string) {
+  try {
+    const { email } = verify(token, String(SECRET_KEY)) as JwtPayload;
+
+    const user = await FindUserByEmail(email);
+
+    if (!user) throw new Error("User does not exist");
+
+    const salt = genSaltSync(10);
+    const hashedPassword = await hash(new_password, salt);
+
+    await prisma.users.update({
+      where: {
+        email,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    });
   } catch (err) {
     throw err;
   }
@@ -264,6 +327,22 @@ export async function LoginService(bodyData: ILogin) {
     const user = await Login(bodyData);
 
     return user;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function ResetPasswordService(new_password: string, token: string) {
+  try {
+    await ResetPassword(new_password, token);
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function VerifyResetService(email: string) {
+  try {
+    await VerifyReset(email);
   } catch (err) {
     throw err;
   }

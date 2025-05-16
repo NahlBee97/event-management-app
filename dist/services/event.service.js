@@ -33,17 +33,41 @@ function GetAllEventService() {
 function CreateEventService(bodyData) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { name, description, category_id, start_date, end_date, total_seats, remaining_seats, price, } = bodyData;
+            const { name, description, category_id, start_date, end_date, total_seats, remaining_seats, price, path, organizer_id, } = bodyData;
+            const now = new Date();
+            const startDate = new Date(start_date);
+            const endDate = new Date(end_date);
+            const tomorrow = new Date(now);
+            tomorrow.setDate(now.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+            if (startDate < tomorrow) {
+                throw new Error("Start date must be at least tomorrow.");
+            }
+            if (endDate.getTime() < startDate.getTime()) {
+                throw new Error("End date cannot be earlier than start date.");
+            }
             const newEvent = yield prisma_1.default.events.create({
                 data: {
-                    name: name,
-                    description: description,
-                    category_id: category_id,
-                    start_date: start_date,
-                    end_date: end_date,
-                    total_seats: total_seats,
-                    remaining_seats: remaining_seats,
-                    price: price,
+                    name,
+                    description,
+                    category_id,
+                    start_date,
+                    end_date,
+                    total_seats,
+                    remaining_seats,
+                    price,
+                    location: 'Online',
+                    path,
+                    organizer_id,
+                },
+                include: {
+                    event_category: true,
+                    users: {
+                        select: {
+                            first_name: true,
+                            last_name: true,
+                        },
+                    },
                 },
             });
             return newEvent;
@@ -56,7 +80,7 @@ function CreateEventService(bodyData) {
 function EditEventByIdService(eventId, bodyData) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { name, description, category_id, start_date, end_date, total_seats, remaining_seats, price } = bodyData;
+            const { name, description, category_id, start_date, end_date, total_seats, remaining_seats, price, path } = bodyData;
             const event = yield prisma_1.default.events.findFirst({
                 where: {
                     id: eventId
@@ -76,7 +100,8 @@ function EditEventByIdService(eventId, bodyData) {
                     end_date: end_date || event.end_date,
                     total_seats: total_seats || event.total_seats,
                     remaining_seats: remaining_seats || event.remaining_seats,
-                    price: price || event.price
+                    price: price || event.price,
+                    path: path || event.path
                 }
             });
             return updatedEvent;
@@ -103,13 +128,13 @@ function DeleteEventByIdService(eventId) {
                 });
             }
             //delete riview
-            const eventReview = yield prisma_1.default.review.findFirst({
+            const eventReview = yield prisma_1.default.reviews.findFirst({
                 where: {
                     event_id: eventId,
                 },
             });
             if (eventReview) {
-                yield prisma_1.default.review.deleteMany({
+                yield prisma_1.default.reviews.deleteMany({
                     where: {
                         event_id: eventId,
                     },

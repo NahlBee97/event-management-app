@@ -2,7 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const auth_controller_1 = require("../controllers/auth.controller");
+const validator_middleware_1 = require("../middlewares/validator.middleware");
+const user_schema_1 = require("../schemas/user.schema");
+const multer_1 = require("../utils/multer");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
 const router = (0, express_1.Router)();
-router.post("/register", auth_controller_1.RegisterController);
-router.post("/login", auth_controller_1.LoginController);
+router.post("/register", (0, validator_middleware_1.ReqValidator)(user_schema_1.registerSchema), auth_controller_1.RegisterController);
+router.post("/login", (0, validator_middleware_1.ReqValidator)(user_schema_1.loginSchema), auth_controller_1.LoginController);
+router.patch("/avatar", auth_middleware_1.VerifyToken, (0, multer_1.Multer)().single("file"), auth_controller_1.UpdateProfileController);
+router.patch("/verify", auth_controller_1.VerifyAccountController);
+router.post("/resetverify", auth_controller_1.VerifyResetController);
+router.patch("/reset", auth_controller_1.ResetPasswordController);
 exports.default = router;

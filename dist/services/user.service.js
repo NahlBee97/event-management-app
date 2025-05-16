@@ -16,9 +16,11 @@ exports.FindUserById = FindUserById;
 exports.GetAllUserService = GetAllUserService;
 exports.FindUserByIdService = FindUserByIdService;
 exports.EditUserByIdService = EditUserByIdService;
+exports.UpdateUserService = UpdateUserService;
 exports.DeleteUserByIdService = DeleteUserByIdService;
 const prisma_1 = __importDefault(require("../lib/prisma"));
-//find user by id function
+const cloudinary_1 = require("../utils/cloudinary");
+const auth_service_1 = require("./auth.service");
 function FindUserById(userId) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -80,7 +82,7 @@ function DeleteUserById(userId) {
                 },
             });
             // Delete related data from the review table
-            yield prisma_1.default.review.deleteMany({
+            yield prisma_1.default.reviews.deleteMany({
                 where: {
                     user_id: userId,
                 },
@@ -115,19 +117,11 @@ function DeleteUserById(userId) {
         }
     });
 }
-function GetAllUserService(params) {
+function GetAllUserService() {
     return __awaiter(this, void 0, void 0, function* () {
-        let users;
-        if (params) {
-            users = yield prisma_1.default.users.findFirst({
-                where: {
-                    email: params
-                }
-            });
-        }
-        else {
-            users = yield prisma_1.default.users.findMany();
-        }
+        const users = yield prisma_1.default.users.findMany();
+        if (!users)
+            throw new Error("No Users Yet");
         return users;
     });
 }
@@ -151,6 +145,34 @@ function EditUserByIdService(userId, body) {
             return editedUser;
         }
         catch (err) {
+            throw err;
+        }
+    });
+}
+function UpdateUserService(file, email) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let url = "";
+        try {
+            const checkUser = yield (0, auth_service_1.FindUserByEmail)(email);
+            if (!checkUser)
+                throw new Error("User not found");
+            yield prisma_1.default.$transaction((t) => __awaiter(this, void 0, void 0, function* () {
+                const { secure_url } = yield (0, cloudinary_1.cloudinaryUpload)(file);
+                url = secure_url;
+                const splitUrl = secure_url.split("/");
+                const fileName = splitUrl[splitUrl.length - 1];
+                yield t.users.update({
+                    where: {
+                        id: checkUser.id
+                    },
+                    data: {
+                        profile_picture: fileName
+                    }
+                });
+            }));
+        }
+        catch (err) {
+            yield (0, cloudinary_1.cloudinaryRemove)(url);
             throw err;
         }
     });

@@ -16,14 +16,17 @@ function SearchEventController(req, res, next) {
         try {
             const searchParams = req.query;
             const data = yield (0, search_event_service_1.SearchEventService)(searchParams);
+            const message = Array.isArray(data) && data.length === 0
+                ? `Event not found`
+                : "search event is success";
             res.status(200).send({
                 success: true,
-                message: `search event is success`,
+                message,
                 data
             });
         }
         catch (error) {
-            next();
+            next(error);
         }
     });
 }
