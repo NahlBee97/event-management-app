@@ -56,8 +56,6 @@ export async function CreateEventService(
       organizer_id,
     } = bodyData;
 
-    Datevalidator(start_date, end_date)
-
     const newEvent = await prisma.events.create({
       data: {
         name,
