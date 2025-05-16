@@ -1,6 +1,29 @@
 import { IBodyEvent } from "../interfaces/event.interface";
 import prisma from "../lib/prisma";
 
+const Datevalidator = (start_date: Date, end_date: Date) => {
+  const now = new Date();
+  const startDate = new Date(start_date);
+  const endDate = new Date(end_date);
+
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+
+  const isSameDay = startDate.toDateString() === endDate.toDateString();
+
+  if (isSameDay && startDate.getTime() >= endDate.getTime()) {
+    throw new Error(
+      "Start time must be earlier than end time. Suggestions edit event for tomorrow"
+    );
+  }
+
+  if (end_date < start_date) {
+    throw new Error("Start date must be at least before end date.");
+  }
+
+}
+
 export async function GetAllEventService() {
   try {
     const events = await prisma.events.findMany();
@@ -27,22 +50,16 @@ export async function CreateEventService(
       path,
       organizer_id,
     } = bodyData;
+    const startDate = new Date(start_date).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
 
-    const now = new Date();
-    const startDate = new Date(start_date);
-    const endDate = new Date(end_date);
-
-    const tomorrow = new Date(now);
-    tomorrow.setDate(now.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-
-    if (startDate < tomorrow) {
-      throw new Error("Start date must be at least tomorrow.");
+    if (startDate < today) {
+      throw new Error(
+        "Minimum start date is tomorrow"
+      );
     }
 
-    if (endDate.getTime() < startDate.getTime()) {
-      throw new Error("End date cannot be earlier than start date.");
-    }
+    Datevalidator(start_date, end_date)
 
     const newEvent = await prisma.events.create({
       data: {
@@ -84,6 +101,18 @@ export async function EditEventByIdService(eventId: number, bodyData: IBodyEvent
     });
 
     if (!event) throw new Error("This event does not exist");
+
+    const originalStartDate = new Date(event.start_date).toISOString().split('T')[0];
+    const startDate = new Date(start_date).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
+
+    if (startDate !== originalStartDate) {
+      if (startDate < today) {
+        throw new Error("Cannot edit start date");
+      }
+    }
+
+    Datevalidator(start_date, end_date)
 
     const updatedEvent = await prisma.events.update({
       where: {

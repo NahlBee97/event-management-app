@@ -85,9 +85,9 @@ export async function EditVoucherByIdService(id: number, body: IBodyEventVoucher
     } = body;
 
     const voucher = await prisma.event_vouchers.findFirst({
-        where: {
-            id
-        }
+      where: {
+        id
+      }
     })
 
     if (!voucher) throw new Error("Voucher not found");
@@ -135,5 +135,39 @@ export async function DeleteVoucherByIdService(
     });
   } catch (err) {
     throw err;
+  }
+}
+
+export async function GetAllVoucherByOrganizerIdService(organizerId: number) {
+  try {
+    const vouchers = await prisma.event_vouchers.findMany({
+      where: {
+        events: {
+          organizer_id: organizerId,
+        },
+      },
+      include: {
+        events: {
+          select: {
+            id: true,
+            name: true,
+            start_date: true,
+            end_date: true,
+            organizer_id: true,
+            users: {
+              select: {
+                id: true,
+                first_name: true,
+                last_name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!vouchers) throw new Error("Voucher not found");
+    return vouchers
+  } catch (error) {
+    throw error;
   }
 }
