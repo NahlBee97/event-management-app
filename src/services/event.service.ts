@@ -19,11 +19,7 @@ const Datevalidator = (start_date: Date, end_date: Date) => {
   }
 
   if (end_date < start_date) {
-    throw new Error("Start date must be at least before endDate.");
-  }
-
-  if (endDate.getTime() < startDate.getTime()) {
-    throw new Error("End date cannot be earlier than start date.");
+    throw new Error("Start date must be at least before end date.");
   }
 
 }
@@ -42,7 +38,6 @@ export async function CreateEventService(
   bodyData: IBodyEvent
 ) {
   try {
-
     const {
       name,
       description,
@@ -55,6 +50,16 @@ export async function CreateEventService(
       path,
       organizer_id,
     } = bodyData;
+    const startDate = new Date(start_date).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
+
+    if (startDate < today) {
+      throw new Error(
+        "Minimum start date is tomorrow"
+      );
+    }
+
+    Datevalidator(start_date, end_date)
 
     const newEvent = await prisma.events.create({
       data: {
@@ -96,6 +101,16 @@ export async function EditEventByIdService(eventId: number, bodyData: IBodyEvent
     });
 
     if (!event) throw new Error("This event does not exist");
+
+    const originalStartDate = new Date(event.start_date).toISOString().split('T')[0];
+    const startDate = new Date(start_date).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
+
+    if (startDate !== originalStartDate) {
+      if (startDate < today) {
+        throw new Error("Cannot edit start date");
+      }
+    }
 
     Datevalidator(start_date, end_date)
 
