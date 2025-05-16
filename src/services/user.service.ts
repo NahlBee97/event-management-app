@@ -1,4 +1,3 @@
-import { Console } from "console";
 import { IBodyUser } from "../interfaces/user.interface";
 import prisma from "../lib/prisma";
 import { cloudinaryRemove, cloudinaryUpload } from "../utils/cloudinary";
@@ -25,9 +24,6 @@ async function EditUserById(userId: number, body: IBodyUser) {
       first_name,
       last_name,
       email,
-      password,
-      role,
-      profile_picture,
     } = body;
 
     const editedUser = await prisma.users.update({
@@ -36,9 +32,6 @@ async function EditUserById(userId: number, body: IBodyUser) {
         first_name: first_name || existedUser?.first_name,
         last_name: last_name || existedUser?.last_name,
         email: email || existedUser?.email,
-        password: password || existedUser?.password,
-        role: role || existedUser?.role,
-        profile_picture: profile_picture || existedUser?.profile_picture,
       },
     });
 

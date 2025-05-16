@@ -225,6 +225,7 @@ async function Login(bodyData: ILogin) {
       first_name: user.first_name,
       last_name: user.last_name,
       role: user.role,
+      referral_code: user.referral_code,
       profile_picture: user.profile_picture,
     };
 
