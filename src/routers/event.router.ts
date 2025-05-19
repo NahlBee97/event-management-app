@@ -8,7 +8,7 @@ import { EOGuard, VerifyToken } from "../middlewares/auth.middleware";
 const router = Router();
 
 //read
-router.get('/', GetAllEventController)
+router.get('/', GetAllEventController);
 router.get("/search", SearchEventController);
 router.get("/detail/:id", GetEventDetailByIdController);
 router.get("/categories", GetAllCategoriesController);

@@ -192,3 +192,4 @@ export async function DeleteEventByIdService(
     throw err;
   }
 }
+

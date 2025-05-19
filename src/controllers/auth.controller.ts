@@ -8,7 +8,6 @@ import {
 } from "../services/auth.service";
 import { IUserReqParam } from "../custom";
 import { UpdateUserService } from "../services/user.service";
-import { FE_URL } from "../config";
 
 export async function RegisterController(
   req: Request,

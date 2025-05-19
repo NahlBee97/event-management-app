@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { CreateTransactionService, DeleteTransactionByIdService, EditTransactionByIdService, FindTransactionByIdService, FindTransactionByUserIdService } from "../services/transaction.service";
+import { CreateTransactionService, DeleteTransactionByIdService, EditTransactionByIdService, FindTransactionByIdService, FindTransactionByUserIdService, FindTransactionsByOrganizerIdService } from "../services/transaction.service";
 
 export async function CreateTransactionController(
   req: Request,
@@ -37,6 +37,24 @@ export async function FindTransactionByUserIdController(
   }
 }
 
+export async function FindTransactionByOrganizerIdController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const organizerId = parseInt(req.params.organizer_id);
+    const transactions = await FindTransactionsByOrganizerIdService(organizerId);
+
+    res.status(200).send({
+      message: `Get transaction list by organizer id ${organizerId} success`,
+      data: transactions,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+  
 export async function FindTransactionByIdController(
   req: Request,
   res: Response,
