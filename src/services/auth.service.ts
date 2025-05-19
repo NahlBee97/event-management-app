@@ -1,8 +1,5 @@
 import { FE_URL, SECRET_KEY } from "../config";
-import IResetPassword, {
-  ILogin,
-  IRegister,
-} from "../interfaces/auth.interface";
+import { ILogin, IRegister } from "../interfaces/auth.interface";
 import prisma from "../lib/prisma";
 import { hash, genSaltSync, compare } from "bcrypt";
 import { JwtPayload, sign, verify } from "jsonwebtoken";
@@ -26,22 +23,43 @@ export async function FindUserByEmail(email: string) {
 
 async function Register(bodyData: IRegister) {
   try {
-    const { first_name, last_name, email, password, role } = bodyData;
+    const { first_name, last_name, email, password, role, referral_code_used } =
+      bodyData;
 
     const user = await FindUserByEmail(email);
 
     if (user) throw new Error("Email already registered");
 
+    //hashing password
     const salt = genSaltSync(10);
     const hashedPassword = await hash(password, salt);
 
-    function referralGenerator() {
-      const yearNow = String(new Date().getFullYear());
-      const referral_code = "REF" + first_name.toUpperCase() + yearNow;
+    //generate referral code
+    const yearNow = String(new Date().getFullYear());
+    const referral_code = "REF" + first_name.toUpperCase() + yearNow;
 
-      return referral_code;
-    }
+    const newUser = await prisma.$transaction(async (t) => {
+      const registeredUser = await t.users.create({
+        data: {
+          first_name: first_name,
+          last_name: last_name,
+          email: email,
+          password: hashedPassword,
+          role: role,
+          referral_code: referral_code,
+        },
+      });
 
+      return registeredUser;
+    });
+
+    if (referral_code_used) {
+      await UpdateReferralLogs(email, referral_code_used);
+      await UpdatePoint(referral_code_used);
+      await GiveCoupon(email);
+    };
+
+    //send email
     const templatePath = path.join(
       __dirname,
       "../templates",
@@ -51,22 +69,11 @@ async function Register(bodyData: IRegister) {
     const templateSource = fs.readFileSync(templatePath, "utf-8");
     const compiledTemplate = handlebars.compile(templateSource);
 
-    const newUser = await prisma.users.create({
-      data: {
-        first_name: first_name,
-        last_name: last_name,
-        email: email,
-        password: hashedPassword,
-        role: role,
-        referral_code: referralGenerator(),
-      },
-    });
-
     const payload = {
       email: newUser.email,
     };
 
-    const token = sign(payload, String(SECRET_KEY), { expiresIn: "24h" });
+    const token = sign(payload, String(SECRET_KEY), { expiresIn: "1h" });
     const html = compiledTemplate({
       first_name,
       email,
@@ -103,9 +110,11 @@ async function VerifyAccount(token: string) {
   }
 }
 
-async function UpdateReferralLogs(bodyData: IRegister) {
+async function UpdateReferralLogs(
+  email: string,
+  referral_code_used: string,
+) {
   try {
-    const { email, referral_code_used } = bodyData;
     //check if referrer exist
     const referrer = await prisma.users.findFirst({
       where: {
@@ -113,12 +122,18 @@ async function UpdateReferralLogs(bodyData: IRegister) {
       },
     });
 
-    if (!referrer) throw new Error("Can not find referrer");
+    if (!referrer) {
+      const user = await FindUserByEmail(email);
+      await prisma.users.delete({
+        where: {id: user?.id}
+      })
+      throw new Error("Can not find referrer");
+    };
 
     //update referral logs
     const user = await FindUserByEmail(email);
 
-    if (!user) throw new Error("Can not find the user");
+    if (!user) throw new Error("Can not find the user: referral");
 
     await prisma.referral_logs.create({
       data: {
@@ -131,9 +146,8 @@ async function UpdateReferralLogs(bodyData: IRegister) {
   }
 }
 
-async function UpdatePoint(bodyData: IRegister) {
+async function UpdatePoint(referral_code_used: string) {
   try {
-    const { referral_code_used } = bodyData;
     // find referrer
     const referrer = await prisma.users.findFirst({
       where: {
@@ -147,14 +161,7 @@ async function UpdatePoint(bodyData: IRegister) {
       currentDate.setMonth(currentDate.getMonth() + 3)
     );
 
-    await prisma.points.create({
-      data: {
-        user_id: referrer.id,
-        points: 0,
-        expired_at: expiredAt,
-      },
-    });
-    //see referrer point
+    //find referrer in table points
     let referrerPoint = await prisma.points.findFirst({
       select: {
         points: true,
@@ -163,43 +170,45 @@ async function UpdatePoint(bodyData: IRegister) {
         user_id: referrer.id,
       },
     });
-    if (!referrerPoint) {
-      referrerPoint = { points: 0 };
-    }
 
-    // Update referrer points
-    referrerPoint.points += 10000;
-    await prisma.points.update({
-      where: {
-        user_id: referrer.id,
-      },
-      data: {
-        points: referrerPoint.points,
-      },
-    });
+    if (referrerPoint) {
+      referrerPoint.points += 10000;
+      await prisma.points.update({
+        where: {
+          user_id: referrer.id,
+        },
+        data: {
+          points: referrerPoint.points,
+          expired_at: expiredAt,
+        },
+      });
+    } else {
+      await prisma.points.create({
+        data: {
+          user_id: referrer.id,
+          points: 0,
+          expired_at: expiredAt,
+        },
+      });
+    }
   } catch (err) {
     throw err;
   }
 }
 
 //give coupon
-async function GiveCoupon(bodyData: IRegister) {
+async function GiveCoupon(email: string) {
   try {
-    const { email } = bodyData;
     const user = await FindUserByEmail(email);
-    if (!user) throw new Error("Can not find user");
+    if (!user) throw new Error("Can not find the user: coupon");
 
-    function CodeGenerator() {
-      const code = "COUPON" + user?.first_name;
-
-      return code;
-    }
+    const code = "COUPON" + user?.first_name;
 
     await prisma.coupons.create({
       data: {
         user_id: user.id,
         discount_percentage: 5,
-        code: CodeGenerator(),
+        code: code,
       },
     });
   } catch (err) {
@@ -265,7 +274,6 @@ async function VerifyReset(email: string) {
       subject: "Reset Password",
       html,
     });
-
   } catch (err) {
     throw err;
   }
@@ -299,15 +307,6 @@ export async function RegisterService(bodyData: IRegister) {
   try {
     const newUser = await Register(bodyData);
 
-    if (bodyData.referral_code_used) {
-      //update referral log
-      await UpdateReferralLogs(bodyData);
-      //update referrer point
-      await UpdatePoint(bodyData);
-      //give coupon
-      await GiveCoupon(bodyData);
-    }
-
     return newUser;
   } catch (err) {
     throw err;
@@ -332,7 +331,10 @@ export async function LoginService(bodyData: ILogin) {
   }
 }
 
-export async function ResetPasswordService(new_password: string, token: string) {
+export async function ResetPasswordService(
+  new_password: string,
+  token: string
+) {
   try {
     await ResetPassword(new_password, token);
   } catch (err) {

@@ -6,17 +6,10 @@ export interface IRegister {
   email: string;
   password: string;
   role: user_roles;
-  role_id: number;
-  referral_code: string;
   referral_code_used: string;
 }
 
 export interface ILogin {
   email: string;
   password: string;
-}
-
-export default interface IResetPassword {
-  email: string;
-  new_password: string;
 }
